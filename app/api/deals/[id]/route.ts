@@ -45,10 +45,23 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return apiError("not_found", "Deal not found.", 404);
   }
 
-  // Check authorization
+  // Check authorization: must be either client or freelancer of this deal
   if (deal.client_id !== profileResult.profile.id && deal.freelancer_id !== profileResult.profile.id) {
     return apiError("forbidden", "You do not have access to this deal.", 403);
   }
 
-  return apiOk({ deal });
+  // Apply privacy rule: Hide client_tg_username until the escrow contract is funded
+  const allowedStatuses = ["funded", "submitted", "completed"];
+  const dealResponse = { ...deal };
+
+  if (!allowedStatuses.includes(dealResponse.status)) {
+    if (dealResponse.client) {
+      dealResponse.client = {
+        ...(dealResponse.client as unknown as Record<string, unknown>),
+        telegram_username: null
+      } as unknown as typeof deal.client;
+    }
+  }
+
+  return apiOk({ deal: dealResponse });
 }

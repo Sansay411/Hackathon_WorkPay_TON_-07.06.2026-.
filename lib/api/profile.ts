@@ -20,6 +20,10 @@ export type WorkPayProfile = {
   successRate: number;
   energyBalance: number;
   tonBalance: number;
+  activeRole: "client" | "freelancer";
+  subscriptionUntil: string | null;
+  subscriptionTier: string | null;
+  connectsBalance: number;
 };
 
 export type ProfileLoadResult =
@@ -29,7 +33,7 @@ export type ProfileLoadResult =
   | { status: "unauthorized"; message: string };
 
 const profileSelect =
-  "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance";
+  "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance, active_role, subscription_until, subscription_tier, connects_balance";
 
 export async function getVerifiedProfile(initData: string | undefined | null): Promise<ProfileLoadResult> {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -93,7 +97,11 @@ export function mapProfileRow(row: Record<string, unknown>): WorkPayProfile {
     completedDealsCount: Number(row.completed_deals_count ?? 0),
     successRate: Number(row.success_rate ?? 0),
     energyBalance: Number(row.energy_balance ?? 20),
-    tonBalance: Number(row.ton_balance ?? 0)
+    tonBalance: Number(row.ton_balance ?? 0),
+    activeRole: row.active_role === "freelancer" ? "freelancer" : "client",
+    subscriptionUntil: typeof row.subscription_until === "string" ? row.subscription_until : null,
+    subscriptionTier: typeof row.subscription_tier === "string" ? row.subscription_tier : null,
+    connectsBalance: typeof row.connects_balance === "number" ? row.connects_balance : 30
   };
 }
 

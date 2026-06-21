@@ -9,6 +9,7 @@ export type ApiErrorCode =
   | "telegram_required"
   | "wallet_required"
   | "freelancer_wallet_missing"
+  | "insufficient_connects"
   | "setup_required"
   | "payment_setup_required"
   | "server_error";
