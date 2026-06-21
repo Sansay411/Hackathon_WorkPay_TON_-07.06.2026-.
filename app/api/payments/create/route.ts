@@ -2,14 +2,17 @@ import { apiError, apiOk } from "@/lib/api/errors";
 import { getVerifiedProfile, walletRequiredError } from "@/lib/api/profile";
 import { paymentCreateSchema } from "@/lib/api/validation";
 import { buildTonTransferRequest, tonToNano } from "@/lib/ton/transactionBuilder";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
-  const parsed = paymentCreateSchema.safeParse(await request.json());
+  const parsed = paymentCreateSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return apiError("bad_request", "Invalid payment create payload.", 400);
   }
 
-  const profileResult = await getVerifiedProfile(parsed.data.initData);
+  const { initData, dealId, asset } = parsed.data;
+
+  const profileResult = await getVerifiedProfile(initData);
   if (profileResult.status === "telegram_required") {
     return apiError("telegram_required", profileResult.message, 400);
   }
@@ -27,8 +30,28 @@ export async function POST(request: Request) {
     return apiError("bad_request", "Mainnet payment creation is disabled.", 400);
   }
 
-  if (parsed.data.asset !== "TON") {
-    return apiError("setup_required", "Only direct TON transfer preparation is enabled. Use STON.fi after provider setup for token swaps.", 503);
+  if (asset !== "TON") {
+    return apiError("bad_request", "Only TON assets are supported in the current custodial escrow configuration.", 400);
+  }
+
+  const supabase = createSupabaseServiceRoleClient();
+  if (!supabase) {
+    return apiError("setup_required", "Supabase service role is not configured.", 503);
+  }
+
+  // Fetch the deal to verify existence and check that the sender is the client
+  const { data: deal, error: dealError } = await supabase
+    .from("deals")
+    .select("id, client_id, price_amount, price_token")
+    .eq("id", dealId)
+    .single();
+
+  if (dealError || !deal) {
+    return apiError("not_found", "Deal not found.", 404);
+  }
+
+  if (deal.client_id !== profileResult.profile.id) {
+    return apiError("forbidden", "Only the client of the deal can initiate the payment.", 403);
   }
 
   const escrowWallet = process.env.ESCROW_WALLET_ADDRESS;
@@ -36,8 +59,9 @@ export async function POST(request: Request) {
     return apiError("setup_required", "ESCROW_WALLET_ADDRESS is not configured. Direct TON payment cannot be created.", 503);
   }
 
-  const amountNano = tonToNano(parsed.data.amount);
-  const reference = `workpay:${parsed.data.dealId}`;
+  const priceAmountStr = Number(deal.price_amount).toString();
+  const amountNano = tonToNano(priceAmountStr);
+  const reference = `workpay:${deal.id}`;
 
   return apiOk({
     provider: {
@@ -45,11 +69,11 @@ export async function POST(request: Request) {
       missing: []
     },
     payment: {
-      dealId: parsed.data.dealId,
+      dealId: deal.id,
       payerWallet: profileResult.profile.walletAddress,
       escrowWallet,
-      asset: "TON",
-      amount: parsed.data.amount,
+      asset: deal.price_token,
+      amount: priceAmountStr,
       amountNano,
       network: process.env.NEXT_PUBLIC_TON_NETWORK === "mainnet" ? "mainnet" : "testnet",
       reference
@@ -57,7 +81,7 @@ export async function POST(request: Request) {
     transaction: buildTonTransferRequest({
       destination: escrowWallet,
       amount: amountNano,
-      asset: "TON",
+      asset: deal.price_token,
       comment: reference
     }),
     auditEvent: "payment_started"

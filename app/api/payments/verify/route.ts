@@ -3,11 +3,18 @@ import { getVerifiedProfile, walletRequiredError } from "@/lib/api/profile";
 import { paymentVerifySchema } from "@/lib/api/validation";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/server";
 import { ProviderBackedTonPaymentVerifier } from "@/lib/ton/paymentVerifier";
+import { sendBotNotification } from "@/lib/telegram/notifications";
 
 export const dynamic = "force-dynamic";
 
+interface ProfileInfo {
+  id: string;
+  wallet_address: string | null;
+  telegram_id: string | null;
+}
+
 export async function POST(request: Request) {
-  const parsed = paymentVerifySchema.safeParse(await request.json());
+  const parsed = paymentVerifySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return apiError("bad_request", "Invalid payment verify payload.", 400);
   }
@@ -17,14 +24,8 @@ export async function POST(request: Request) {
   }
 
   const profileResult = await getVerifiedProfile(parsed.data.initData);
-  if (profileResult.status === "telegram_required") {
-    return apiError("telegram_required", profileResult.message, 400);
-  }
-  if (profileResult.status === "setup_required") {
-    return apiError("setup_required", profileResult.message, 503);
-  }
-  if (profileResult.status === "unauthorized") {
-    return apiError("unauthorized", profileResult.message, 401);
+  if (profileResult.status !== "ready") {
+    return apiError("unauthorized", "Authentication failed.", 401);
   }
   if (!profileResult.profile.walletAddress) {
     return apiError(walletRequiredError().error, walletRequiredError().message, 403);
@@ -35,86 +36,138 @@ export async function POST(request: Request) {
     return apiError("setup_required", "ESCROW_WALLET_ADDRESS is required before verifying a TON payment.", 503);
   }
 
-  const verifier = new ProviderBackedTonPaymentVerifier();
-  const expectedAmount = getExpectedDemoAmount(parsed.data.dealId);
-  const expectedAsset = "TON";
-  const result = await verifier.verify({
-    txHash: parsed.data.txHash,
-    expectedEscrowWallet: escrowWallet,
-    expectedSenderWallet: parsed.data.walletAddress ?? profileResult.profile.walletAddress,
-    expectedAmount,
-    expectedAsset,
-    expectedComment: `workpay:${parsed.data.dealId}`,
-    network: parsed.data.network
-  });
-
-  if (result.status === "provider_not_configured") {
-    return apiError("setup_required", result.reason, 503);
-  }
-
-  const balanceUpdate =
-    result.status === "confirmed" && parsed.data.dealId === "wallet-readiness"
-      ? await recordVerifiedDeposit({
-          profileId: profileResult.profile.id,
-          txHash: result.txHash,
-          amount: expectedAmount,
-          network: parsed.data.network
-        })
-      : null;
-
-  return apiOk({
-    dealId: parsed.data.dealId,
-    network: parsed.data.network,
-    expectedAmount,
-    expectedAsset,
-    verification: result,
-    balanceUpdate
-  });
-}
-
-function getExpectedDemoAmount(dealId: string): string {
-  if (dealId === "wallet-readiness") {
-    return "1";
-  }
-  return "20";
-}
-
-async function recordVerifiedDeposit(input: { profileId: string; txHash: string; amount: string; network: "testnet" | "mainnet" }) {
   const supabase = createSupabaseServiceRoleClient();
   if (!supabase) {
-    return { status: "setup_required", message: "Supabase service role is required to record wallet balance." };
+    return apiError("setup_required", "Supabase service role is required to verify payments.", 503);
   }
 
-  const { data: existing } = await supabase
-    .from("balance_transactions")
-    .select("id")
-    .eq("tx_hash", input.txHash)
-    .maybeSingle();
-  if (existing) {
-    return { status: "already_recorded" };
+  // Fetch deal details using service role to bypass client-level RLS restrict
+  const { data: deal, error: dealError } = await supabase
+    .from("deals")
+    .select(`
+      id, 
+      title,
+      status, 
+      price_amount, 
+      price_token, 
+      client_id, 
+      freelancer_id,
+      client:client_id (id, wallet_address, telegram_id),
+      freelancer:freelancer_id (id, wallet_address, telegram_id)
+    `)
+    .eq("id", parsed.data.dealId)
+    .single();
+
+  if (dealError || !deal) {
+    return apiError("not_found", "Deal not found.", 404);
   }
 
-  const { data: profile, error: profileError } = await supabase.from("profiles").select("ton_balance").eq("id", input.profileId).single();
-  if (profileError) {
-    return { status: "setup_required", message: "Supabase ton_balance migration is required before recording wallet balance." };
+  // Idempotency: If already funded or complete, skip blockchain verify and return success
+  if (deal.status === "funded" || deal.status === "completed") {
+    return apiOk({
+      dealId: deal.id,
+      verification: { status: "confirmed", txHash: parsed.data.txHash }
+    });
   }
-  const nextBalance = Number(profile?.ton_balance ?? 0) + Number(input.amount);
-  const { error: updateError } = await supabase.from("profiles").update({ ton_balance: nextBalance }).eq("id", input.profileId);
+
+  // Business logic check: must be draft or waiting_payment to receive fundings
+  if (deal.status !== "draft" && deal.status !== "waiting_payment") {
+    return apiError("conflict", `Escrow contract status must be draft or waiting_payment, current status: ${deal.status}`, 409);
+  }
+
+  const clientProfile = deal.client as unknown as ProfileInfo | null;
+  const freelancerProfile = deal.freelancer as unknown as ProfileInfo | null;
+
+  let verificationResult;
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
+    // In demo mode, bypass actual blockchain verification to ease testing
+    verificationResult = {
+      status: "confirmed" as const,
+      txHash: parsed.data.txHash,
+      amountNano: String(deal.price_amount)
+    };
+  } else {
+    const verifier = new ProviderBackedTonPaymentVerifier();
+    verificationResult = await verifier.verify({
+      txHash: parsed.data.txHash,
+      expectedEscrowWallet: escrowWallet,
+      expectedSenderWallet: clientProfile?.wallet_address || "",
+      expectedAmount: String(deal.price_amount),
+      expectedAsset: deal.price_token,
+      expectedComment: `workpay:${deal.id}`,
+      network: parsed.data.network
+    });
+  }
+
+  if (verificationResult.status !== "confirmed") {
+    return apiError(
+      "bad_request",
+      (verificationResult as { reason?: string }).reason ?? "Transaction verification failed on-chain.",
+      400
+    );
+  }
+
+  // Perform database updates using service_role to bypass client-level RLS restrictions
+  const oldStatus = deal.status;
+  const nextStatus = "funded";
+
+  // 1. Update deal status
+  const { error: updateError } = await supabase
+    .from("deals")
+    .update({ 
+      status: nextStatus,
+      funding_tx_hash: parsed.data.txHash
+    })
+    .eq("id", deal.id);
+
   if (updateError) {
-    return { status: "setup_required", message: "Wallet balance update failed in Supabase." };
-  }
-  const { error: ledgerError } = await supabase.from("balance_transactions").insert({
-    profile_id: input.profileId,
-    amount: input.amount,
-    asset: "TON",
-    type: "ton_deposit",
-    reason: "Verified TON wallet top-up",
-    tx_hash: input.txHash,
-    metadata: { network: input.network, source: "toncenter" }
-  });
-  if (ledgerError) {
-    return { status: "setup_required", message: "Balance ledger migration is required before recording wallet balance." };
+    return apiError("server_error", "Failed to update deal status in database.", 500);
   }
 
-  return { status: "recorded", balanceTon: nextBalance };
+  // 2. Insert payment row
+  const payerWallet = clientProfile?.wallet_address || "";
+  const receiverWallet = freelancerProfile?.wallet_address || "";
+  const { error: paymentError } = await supabase.from("payments").insert({
+    deal_id: deal.id,
+    payer_wallet: payerWallet,
+    receiver_wallet: receiverWallet,
+    escrow_wallet: escrowWallet,
+    amount: deal.price_amount,
+    asset: deal.price_token,
+    network: parsed.data.network,
+    status: "verified",
+    tx_hash: parsed.data.txHash
+  });
+
+  if (paymentError) {
+    console.error("Failed to insert payment audit log:", paymentError);
+  }
+
+  // 3. Log deal event
+  await supabase.from("deal_events").insert({
+    deal_id: deal.id,
+    actor_id: profileResult.profile.id,
+    event_type: "deal_funded",
+    from_status: oldStatus,
+    to_status: nextStatus
+  });
+
+  // 4. Notify freelancer of locked escrow funds
+  const freelancerTelegramId = freelancerProfile?.telegram_id;
+  if (freelancerTelegramId) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://workpay-ton-fixed.vercel.app";
+    const text = `💰 <b>Заказчик внес оплату в эскроу.</b>\n\nПроект переведен в статус "В работе". Вы можете приступать к выполнению!`;
+    await sendBotNotification(
+      freelancerTelegramId,
+      text,
+      "Start Work",
+      `${appUrl}/deals/${deal.id}`
+    );
+  }
+
+  return apiOk({
+    dealId: deal.id,
+    network: parsed.data.network,
+    verification: verificationResult
+  });
 }

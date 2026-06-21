@@ -21,6 +21,8 @@ export function TelegramProfilePanel() {
   const [bio, setBio] = useState("");
   const [skills, setSkills] = useState("");
   const [rate, setRate] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!initData) {
@@ -67,6 +69,53 @@ export function TelegramProfilePanel() {
   const avatarUrl = profile?.avatarUrl ?? user?.photoUrl ?? null;
   const telegramUsername = profile?.telegramUsername ?? user?.username ?? null;
 
+  async function handleSave() {
+    if (!initData) return;
+    setBusy(true);
+    setStatusMsg(null);
+
+    const skillsArray = skills
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
+    const updatePayload: Record<string, unknown> = {
+      initData,
+      bio: bio.trim(),
+      skills: skillsArray
+    };
+
+    if (rate.trim()) {
+      // Validate rate format: e.g. 55 or 55.50
+      if (!/^\d+(\.\d{1,2})?$/.test(rate.trim())) {
+        setStatusMsg("Invalid hourly rate. Must be a number (e.g. 55 or 55.50).");
+        setBusy(false);
+        return;
+      }
+      updatePayload.hourlyRate = rate.trim();
+    }
+
+    try {
+      const response = await fetch("/api/profile/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatePayload)
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) {
+        setStatusMsg(result.error?.message ?? "Failed to save profile.");
+        return;
+      }
+      setProfile(result.data.profile);
+      setStatusMsg("Profile details saved successfully!");
+      setTimeout(() => setStatusMsg(null), 3000);
+    } catch (error) {
+      setStatusMsg(error instanceof Error ? error.message : "Error saving profile.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       <section className="rounded-3xl border border-[#dfe3e8] bg-white p-5 shadow-[0_10px_30px_rgba(0,101,142,0.07)]">
@@ -82,9 +131,9 @@ export function TelegramProfilePanel() {
         </div>
 
         <div className="mt-5 grid grid-cols-3 gap-2">
-          <Stat label={t.profileExtra.statDeals} value="0" />
-          <Stat label={t.profileExtra.statRating} value={t.profileExtra.ratingNew} />
-          <Stat label={t.profileExtra.statPaid} value={t.profileExtra.paidZero} />
+          <Stat label={t.profileExtra.statDeals} value={String(profile?.completedDealsCount ?? 0)} />
+          <Stat label={t.profileExtra.statRating} value={profile?.completedDealsCount && profile.rating != null ? `${profile.rating.toFixed(1)}/5` : t.profileExtra.ratingNew} />
+          <Stat label={t.profileExtra.statPaid} value={profile?.completedDealsCount && profile.hourlyRate != null ? `${profile.hourlyRate} TON` : t.profileExtra.paidZero} />
         </div>
 
         <div className="mt-4 rounded-2xl bg-[#f6faff] p-3">
@@ -113,8 +162,20 @@ export function TelegramProfilePanel() {
             <input className="h-12 rounded-2xl border border-[#dfe3e8] bg-[#f6faff] px-4 text-sm font-semibold outline-none focus:border-[#229ED9]" inputMode="decimal" onChange={(event) => setRate(event.target.value)} placeholder="55" value={rate} />
           </label>
         </div>
-        <button className="mt-4 w-full rounded-2xl bg-[#229ED9] px-4 py-3 text-sm font-black text-white" type="button">
-          {t.profile.saveDetails}
+
+        {statusMsg ? (
+          <div className={`mt-3 rounded-2xl p-3 text-xs font-black ${statusMsg.includes("success") ? "bg-[#eafaf1] text-[#27ae60]" : "bg-[#fff4f4] text-[#c0392b]"}`}>
+            {statusMsg}
+          </div>
+        ) : null}
+
+        <button 
+          className="mt-4 w-full rounded-2xl bg-[#229ED9] px-4 py-3 text-sm font-black text-white disabled:opacity-50" 
+          onClick={handleSave}
+          disabled={busy}
+          type="button"
+        >
+          {busy ? "Saving..." : t.profile.saveDetails}
         </button>
       </section>
 

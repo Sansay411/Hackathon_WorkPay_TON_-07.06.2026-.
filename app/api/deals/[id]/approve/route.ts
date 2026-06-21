@@ -39,17 +39,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   try {
-    assertDealTransition(deal.status, "approved");
-    assertDealTransition("approved", "release_pending");
+    assertDealTransition(deal.status, "completed");
   } catch (error) {
     return apiError("conflict", error instanceof Error ? error.message : "Invalid deal status transition.", 409);
   }
 
-  await supabase.from("deals").update({ status: "release_pending" }).eq("id", id);
+  await supabase.from("deals").update({ status: "completed" }).eq("id", id);
   await supabase.from("deal_events").insert([
-    { deal_id: id, actor_id: profileResult.profile.id, event_type: "deal_approved", from_status: deal.status, to_status: "approved" },
-    { deal_id: id, actor_id: profileResult.profile.id, event_type: "release_started", from_status: "approved", to_status: "release_pending" }
+    { deal_id: id, actor_id: profileResult.profile.id, event_type: "deal_completed", from_status: deal.status, to_status: "completed" }
   ]);
 
-  return apiOk({ dealId: id, status: "release_pending", auditEvents: ["deal_approved", "release_started"] });
+  return apiOk({ dealId: id, status: "completed", auditEvent: "deal_completed" });
 }

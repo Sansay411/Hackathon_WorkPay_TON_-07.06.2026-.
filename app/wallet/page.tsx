@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ArrowLeftRight, ShieldCheck, WalletCards } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import { WalletConnectCard } from "@/components/wallet-connect-card";
@@ -14,7 +14,7 @@ export default function WalletPage() {
   const { initData } = useTelegram();
   const [tonBalance, setTonBalance] = useState<number | null>(null);
 
-  const fetchBalance = () => {
+  const fetchBalance = useCallback(() => {
     if (!initData) return;
     fetch(`/api/wallet/balance?initData=${encodeURIComponent(initData)}`)
       .then((r) => r.json())
@@ -22,9 +22,11 @@ export default function WalletPage() {
         if (typeof payload.data?.balanceTon === "number") setTonBalance(payload.data.balanceTon);
       })
       .catch(() => undefined);
-  };
+  }, [initData]);
 
-  useEffect(() => { fetchBalance(); }, [initData]);
+  useEffect(() => {
+    fetchBalance();
+  }, [fetchBalance]);
 
   return (
     <MobileShell>

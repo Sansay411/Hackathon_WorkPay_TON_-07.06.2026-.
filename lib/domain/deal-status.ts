@@ -16,17 +16,17 @@ export const dealStatuses = [
 export type DealStatus = (typeof dealStatuses)[number];
 
 const transitions: Record<DealStatus, readonly DealStatus[]> = {
-  draft: ["ai_reviewed", "cancelled"],
+  draft: ["waiting_payment", "cancelled", "ai_reviewed"],
   ai_reviewed: ["waiting_payment", "draft", "cancelled"],
-  waiting_payment: ["swap_pending", "funded", "cancelled"],
+  waiting_payment: ["funded", "cancelled", "swap_pending"],
   swap_pending: ["funded", "waiting_payment", "cancelled"],
   funded: ["in_progress", "disputed", "cancelled"],
-  in_progress: ["submitted", "disputed"],
-  submitted: ["approved", "in_progress", "disputed"],
-  approved: ["release_pending", "disputed"],
+  in_progress: ["submitted", "disputed", "cancelled"],
+  submitted: ["completed", "approved", "in_progress", "disputed", "cancelled"],
+  approved: ["completed", "release_pending", "disputed"],
   release_pending: ["completed", "disputed"],
   completed: [],
-  disputed: ["cancelled"],
+  disputed: ["cancelled", "completed"],
   cancelled: []
 };
 

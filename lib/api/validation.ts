@@ -42,7 +42,7 @@ export const paymentCreateSchema = z.object({
   initData: z.string().optional(),
   dealId: z.string().min(1),
   asset: z.string().min(2).max(20),
-  amount: z.string().regex(/^\d+(\.\d{1,9})?$/),
+  amount: z.string().regex(/^\d+(\.\d{1,9})?$/).optional(),
   paymentMode: z.enum(["direct_ton", "stonfi_swap"]).default("direct_ton")
 });
 

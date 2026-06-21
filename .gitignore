@@ -8,4 +8,4 @@ coverage
 *.tsbuildinfo
 *.log
 
-.vercel
+/PROJECT/

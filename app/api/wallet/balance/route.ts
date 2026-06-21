@@ -1,6 +1,5 @@
 import { apiError, apiOk } from "@/lib/api/errors";
 import { getVerifiedProfile } from "@/lib/api/profile";
-import { createSupabaseServiceRoleClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -17,27 +16,11 @@ export async function GET(request: Request) {
     return apiError("unauthorized", profileResult.message, 401);
   }
 
-  const supabase = createSupabaseServiceRoleClient();
-  if (!supabase) {
-    return apiError("setup_required", "Supabase service role is required for wallet balance.", 503);
-  }
-
-  let balanceTon = profileResult.profile.tonBalance;
-  const { data: balanceRow } = await supabase.from("profiles").select("ton_balance").eq("id", profileResult.profile.id).maybeSingle();
-  if (balanceRow && typeof balanceRow.ton_balance !== "undefined") {
-    balanceTon = Number(balanceRow.ton_balance ?? 0);
-  }
-
-  const { data } = await supabase
-    .from("balance_transactions")
-    .select("id, profile_id, amount, asset, type, reason, tx_hash, created_at")
-    .eq("profile_id", profileResult.profile.id)
-    .order("created_at", { ascending: false })
-    .limit(20);
-
+  // We return 0 balance and empty transactions since legacy user profile balance tracking
+  // was deleted. All payments are now directly processed and escrowed per deal.
   return apiOk({
-    balanceTon,
+    balanceTon: 0,
     walletAddress: profileResult.profile.walletAddress,
-    transactions: data ?? []
+    transactions: []
   });
 }
