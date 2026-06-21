@@ -143,30 +143,48 @@ export function PaymentStatusCard({ dealId, amount, asset, onVerifiedDeposit }: 
                 setBusy(true);
                 setStatus("Verifying transaction...");
                 try {
-                  const response = await fetch("/api/payments/verify", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ initData, dealId, txHash, network: "testnet" })
-                  });
-                  const payload = (await response.json()) as PaymentVerifyResponse;
-                  const verification = payload.data?.verification;
-                  const balanceUpdate = payload.data?.balanceUpdate;
-                  
-                  if (!response.ok || !payload.ok) {
-                    setStatus(payload.error?.message ?? "Verification failed");
-                    return;
-                  }
-                  
-                  const newBalance = balanceUpdate?.balanceTon;
-                  setStatus(
-                    verification?.status === "confirmed"
-                      ? newBalance !== null && newBalance !== undefined
-                        ? `Payment confirmed. Wallet Balance: ${newBalance} TON`
-                        : "Payment confirmed successfully"
-                      : verification?.reason ?? verification?.status ?? "Not confirmed yet"
-                  );
-                  if (verification?.status === "confirmed" && newBalance !== null && newBalance !== undefined) {
-                    onVerifiedDeposit?.(newBalance);
+                  if (dealId === "wallet-readiness") {
+                    const response = await fetch("/api/wallet/deposit", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ initData, txHash, amount, network: "testnet" })
+                    });
+                    const payload = await response.json();
+                    if (!response.ok || !payload.ok) {
+                      setStatus(payload.error?.message ?? "Verification failed");
+                      return;
+                    }
+                    const newBalance = payload.data?.balanceTon;
+                    setStatus(`Deposit confirmed. Wallet Balance: ${newBalance} TON`);
+                    if (newBalance !== null && newBalance !== undefined) {
+                      onVerifiedDeposit?.(newBalance);
+                    }
+                  } else {
+                    const response = await fetch("/api/payments/verify", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ initData, dealId, txHash, network: "testnet" })
+                    });
+                    const payload = (await response.json()) as PaymentVerifyResponse;
+                    const verification = payload.data?.verification;
+                    const balanceUpdate = payload.data?.balanceUpdate;
+                    
+                    if (!response.ok || !payload.ok) {
+                      setStatus(payload.error?.message ?? "Verification failed");
+                      return;
+                    }
+                    
+                    const newBalance = balanceUpdate?.balanceTon;
+                    setStatus(
+                      verification?.status === "confirmed"
+                        ? newBalance !== null && newBalance !== undefined
+                          ? `Payment confirmed. Wallet Balance: ${newBalance} TON`
+                          : "Payment confirmed successfully"
+                        : verification?.reason ?? verification?.status ?? "Not confirmed yet"
+                    );
+                    if (verification?.status === "confirmed" && newBalance !== null && newBalance !== undefined) {
+                      onVerifiedDeposit?.(newBalance);
+                    }
                   }
                 } catch (error) {
                   setStatus(error instanceof Error ? error.message : "Verification request failed");

@@ -2,7 +2,7 @@
 
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { EnergyCard } from "@/components/mobile/EnergyCard";
+import { ConnectsWidget } from "@/components/mobile/ConnectsWidget";
 import { EmptyState } from "@/components/mobile/EmptyState";
 import { JobCard } from "@/components/mobile/JobCard";
 import { MobileShell } from "@/components/mobile/MobileShell";
@@ -37,7 +37,10 @@ export default function MarketplacePage() {
           <h1 className="mt-1 text-[34px] font-black leading-none tracking-normal">{t.marketplace.title}</h1>
           <p className="mt-2 text-sm font-medium leading-6 text-[#64748b]">{t.marketplace.description}</p>
         </header>
-        <EnergyCard balance={profile?.energyBalance ?? demoProfile.energyBalance} />
+        <ConnectsWidget
+          connects={profile?.connectsBalance ?? demoProfile.connectsBalance ?? 30}
+          subscriptionUntil={profile?.subscriptionUntil ?? demoProfile.subscriptionUntil ?? null}
+        />
         <label className="flex h-14 items-center gap-3 rounded-[24px] border border-[#dfe3e8] bg-white px-4 shadow-[0_12px_30px_rgba(0,101,142,0.08)]">
           <Search className="h-5 w-5 text-[#64748b]" />
           <input className="w-full bg-transparent text-sm font-semibold outline-none placeholder:text-[#64748b]" placeholder={t.marketplace.search} />

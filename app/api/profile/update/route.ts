@@ -24,10 +24,11 @@ export async function POST(request: Request) {
     return apiError("setup_required", "Supabase service role is required to update profiles.", 503);
   }
 
-  const { initData, hourlyRate, portfolioChannel, githubUrl, linkedinUrl, websiteUrl, ...rest } = parsed.data;
+  const { initData, hourlyRate, activeRole, portfolioChannel, githubUrl, linkedinUrl, websiteUrl, ...rest } = parsed.data;
   void initData;
   const update = {
     ...rest,
+    active_role: activeRole,
     hourly_rate: hourlyRate,
     portfolio_channel: portfolioChannel,
     github_url: githubUrl,
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
     .update(update)
     .eq("id", profileResult.profile.id)
     .select(
-      "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance"
+      "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance, active_role, subscription_until, subscription_tier, connects_balance"
     )
     .single();
 

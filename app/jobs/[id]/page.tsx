@@ -30,6 +30,38 @@ export default function JobDetailPage() {
     };
   }, [id]);
 
+  const { profile } = useTelegram();
+  const isFreelancer = profile?.activeRole === "freelancer";
+  const hasSubscription = profile?.subscriptionUntil ? new Date(profile.subscriptionUntil) > new Date() : false;
+
+  if (profile && isFreelancer && !hasSubscription) {
+    return (
+      <MobileShell>
+        <div className="space-y-5 py-10 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#fff4f4] text-[#c0392b]">
+            <ShieldAlert className="h-8 w-8" />
+          </div>
+          <h1 className="text-2xl font-black text-[#171c20]">Subscription Required</h1>
+          <p className="text-sm font-semibold text-[#64748b] leading-6 px-4">
+            Freelancers require an active premium subscription to view detailed job postings and apply. 
+            Get unlimited access and 30 connects for just $20/month via @CryptoBot.
+          </p>
+          <div className="pt-4">
+            <button
+              onClick={() => {
+                window.open("https://t.me/CryptoBot", "_blank");
+              }}
+              className="rounded-2xl bg-[#229ED9] px-6 py-3 text-sm font-black text-white hover:bg-[#1a85b8] transition-all"
+              type="button"
+            >
+              Subscribe via @CryptoBot ($20/mo)
+            </button>
+          </div>
+        </div>
+      </MobileShell>
+    );
+  }
+
   return (
     <MobileShell>
       <div className="space-y-5">

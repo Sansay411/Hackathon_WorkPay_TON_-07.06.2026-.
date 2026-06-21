@@ -332,36 +332,81 @@ export default function DealDetailPage() {
 
           {/* IN PROGRESS (Freelancer working, submits deliverables) */}
           {deal.status === "in_progress" && isFreelancer ? (
-            <form onSubmit={handleSubmitDelivery} className="rounded-[30px] border border-[#dfe3e8] bg-white p-5 shadow-sm space-y-3">
-              <h3 className="font-black text-[#171c20]">Submit Deliverables</h3>
-              <label className="block space-y-1">
-                <span className="text-xs font-black text-[#64748b]">Message to Client</span>
-                <textarea
-                  className="min-h-20 w-full rounded-xl border border-[#dfe3e8] bg-[#f6faff] px-3 py-2 text-xs font-semibold outline-none focus:border-[#229ED9]"
-                  placeholder="e.g. Logo designs are completed and attached."
-                  onChange={(e) => setDeliveryMessage(e.target.value)}
-                  value={deliveryMessage}
-                  required
-                />
-              </label>
-              <label className="block space-y-1">
-                <span className="text-xs font-black text-[#64748b]">Work URL / Deliverable Link</span>
-                <input
-                  className="h-10 w-full rounded-xl border border-[#dfe3e8] bg-[#f6faff] px-3 text-xs font-semibold outline-none focus:border-[#229ED9]"
-                  placeholder="https://drive.google.com/... or Figma Link"
-                  type="url"
-                  onChange={(e) => setDeliveryLink(e.target.value)}
-                  value={deliveryLink}
-                />
-              </label>
-              <button
-                className="w-full rounded-xl bg-[#229ED9] py-2.5 text-xs font-black text-white disabled:opacity-50"
-                type="submit"
-                disabled={busy}
-              >
-                Submit Deliverables to Client
-              </button>
-            </form>
+            <div className="space-y-4">
+              {/* Progress Update Panel */}
+              <div className="rounded-[30px] border border-[#dfe3e8] bg-white p-5 shadow-sm space-y-3">
+                <h3 className="font-black text-[#171c20]">Log Progress</h3>
+                <p className="text-xs font-semibold text-[#64748b] leading-relaxed">
+                  Select your current status to log it on-chain/in database:
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {["Разработка архитектуры", "Фронтенд готов", "Тестирование"].map((stepName) => (
+                    <button
+                      key={stepName}
+                      type="button"
+                      disabled={busy}
+                      onClick={async () => {
+                        setBusy(true);
+                        setErrorMsg(null);
+                        try {
+                          const res = await fetch(`/api/deals/${deal.id}/progress`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ initData, progressStatus: stepName })
+                          });
+                          const payload = await res.json();
+                          if (!res.ok || !payload.ok) {
+                            setErrorMsg(payload.error?.message ?? "Failed to log progress.");
+                          } else {
+                            setErrorMsg("Progress logged: " + stepName);
+                            setTimeout(() => setErrorMsg(null), 3000);
+                          }
+                        } catch {
+                          setErrorMsg("Connection issue.");
+                        } finally {
+                          setBusy(false);
+                        }
+                      }}
+                      className="rounded-xl border border-[#dfe3e8] bg-[#f6faff] py-2 text-[10px] font-black text-[#00658e] hover:border-[#229ED9] active:scale-95 transition-all"
+                    >
+                      {stepName}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Submit Deliverables Form */}
+              <form onSubmit={handleSubmitDelivery} className="rounded-[30px] border border-[#dfe3e8] bg-white p-5 shadow-sm space-y-3">
+                <h3 className="font-black text-[#171c20]">Submit Deliverables</h3>
+                <label className="block space-y-1">
+                  <span className="text-xs font-black text-[#64748b]">Message to Client</span>
+                  <textarea
+                    className="min-h-20 w-full rounded-xl border border-[#dfe3e8] bg-[#f6faff] px-3 py-2 text-xs font-semibold outline-none focus:border-[#229ED9]"
+                    placeholder="e.g. Logo designs are completed and attached."
+                    onChange={(e) => setDeliveryMessage(e.target.value)}
+                    value={deliveryMessage}
+                    required
+                  />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-xs font-black text-[#64748b]">Work URL / Deliverable Link</span>
+                  <input
+                    className="h-10 w-full rounded-xl border border-[#dfe3e8] bg-[#f6faff] px-3 text-xs font-semibold outline-none focus:border-[#229ED9]"
+                    placeholder="https://drive.google.com/... or Figma Link"
+                    type="url"
+                    onChange={(e) => setDeliveryLink(e.target.value)}
+                    value={deliveryLink}
+                  />
+                </label>
+                <button
+                  className="w-full rounded-xl bg-[#229ED9] py-2.5 text-xs font-black text-white disabled:opacity-50"
+                  type="submit"
+                  disabled={busy}
+                >
+                  Submit Deliverables to Client
+                </button>
+              </form>
+            </div>
           ) : deal.status === "in_progress" && isClient ? (
             <div className="rounded-2xl bg-[#f6faff] p-4 text-center text-xs font-semibold text-[#64748b]">
               Contract is in progress. Awaiting freelancer work submission.

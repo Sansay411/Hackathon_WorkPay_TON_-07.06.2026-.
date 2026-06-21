@@ -116,6 +116,34 @@ export function TelegramProfilePanel() {
     }
   }
 
+  async function toggleRole() {
+    if (!profile) return;
+    const nextRole = profile.activeRole === "client" ? "freelancer" : "client";
+    setBusy(true);
+    setStatusMsg(null);
+    try {
+      const response = await fetch("/api/profile/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData, activeRole: nextRole })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) {
+        setStatusMsg(result.error?.message ?? "Failed to switch role.");
+        return;
+      }
+      setProfile(result.data.profile);
+      setStatusMsg(`Switched role to ${nextRole === "client" ? "Client" : "Freelancer"}!`);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      setStatusMsg(error instanceof Error ? error.message : "Error switching role.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       <section className="rounded-3xl border border-[#dfe3e8] bg-white p-5 shadow-[0_10px_30px_rgba(0,101,142,0.07)]">
@@ -142,6 +170,23 @@ export function TelegramProfilePanel() {
             {authStatus === "verified" ? t.profile.authVerified : authStatus === "verifying" ? t.profile.authVerifying : t.profile.authUnavailable}
           </p>
           <p className="mt-1 text-xs font-semibold text-[#64748b]">{t.profile.sourceNote}</p>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between rounded-2xl bg-[#f6faff] p-4 border border-[#e6f4ff]">
+          <div>
+            <p className="text-xs font-bold text-[#64748b] uppercase tracking-wider">Active Role</p>
+            <p className="text-base font-black text-[#171c20] capitalize mt-0.5">
+              {profile?.activeRole ?? "Client"}
+            </p>
+          </div>
+          <button
+            onClick={toggleRole}
+            disabled={busy}
+            className="rounded-xl bg-[#229ED9] px-3 py-2 text-xs font-black text-white hover:bg-[#1a85b8] active:scale-95 transition-all shadow-sm"
+            type="button"
+          >
+            Switch to {profile?.activeRole === "client" ? "Freelancer" : "Client"}
+          </button>
         </div>
       </section>
 

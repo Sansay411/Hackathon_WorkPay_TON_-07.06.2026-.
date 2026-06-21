@@ -34,6 +34,37 @@ export async function POST(request: Request) {
     return apiError("bad_request", "Only TON assets are supported in the current custodial escrow configuration.", 400);
   }
 
+  const escrowWallet = process.env.ESCROW_WALLET_ADDRESS;
+  if (!escrowWallet) {
+    return apiError("setup_required", "ESCROW_WALLET_ADDRESS is not configured. Direct TON payment cannot be created.", 503);
+  }
+
+  if (dealId === "wallet-readiness") {
+    const depositAmount = parsed.data.amount || "1.0";
+    const amountNano = tonToNano(depositAmount);
+    const reference = `deposit:${profileResult.profile.id}`;
+    return apiOk({
+      provider: { status: "ready", missing: [] },
+      payment: {
+        dealId,
+        payerWallet: profileResult.profile.walletAddress,
+        escrowWallet,
+        asset: "TON",
+        amount: depositAmount,
+        amountNano,
+        network: process.env.NEXT_PUBLIC_TON_NETWORK === "mainnet" ? "mainnet" : "testnet",
+        reference
+      },
+      transaction: buildTonTransferRequest({
+        destination: escrowWallet,
+        amount: amountNano,
+        asset: "TON",
+        comment: reference
+      }),
+      auditEvent: "deposit_payment_started"
+    });
+  }
+
   const supabase = createSupabaseServiceRoleClient();
   if (!supabase) {
     return apiError("setup_required", "Supabase service role is not configured.", 503);
@@ -54,10 +85,7 @@ export async function POST(request: Request) {
     return apiError("forbidden", "Only the client of the deal can initiate the payment.", 403);
   }
 
-  const escrowWallet = process.env.ESCROW_WALLET_ADDRESS;
-  if (!escrowWallet) {
-    return apiError("setup_required", "ESCROW_WALLET_ADDRESS is not configured. Direct TON payment cannot be created.", 503);
-  }
+
 
   const priceAmountStr = Number(deal.price_amount).toString();
   const amountNano = tonToNano(priceAmountStr);

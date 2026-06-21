@@ -2,6 +2,7 @@ import { apiError, apiOk } from "@/lib/api/errors";
 import { getVerifiedProfile } from "@/lib/api/profile";
 import { assertDealTransition } from "@/lib/domain/deal-status";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/server";
+import { sendArbitrationAlert } from "@/lib/telegram/notifications";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -23,7 +24,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const { data: deal, error: dealError } = await supabase
     .from("deals")
-    .select("id, status, client_id, freelancer_id")
+    .select("id, status, title, client_id, freelancer_id")
     .eq("id", id)
     .single();
 
@@ -51,6 +52,23 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     from_status: oldStatus,
     to_status: "disputed"
   });
+
+  // Fetch log history and trigger arbitration Telegram alert
+  const { data: events } = await supabase
+    .from("deal_events")
+    .select("event_type, metadata, actor_id, created_at")
+    .eq("deal_id", id)
+    .order("created_at", { ascending: true });
+
+  const eventsHistory = events || [];
+  eventsHistory.push({
+    event_type: "deal_disputed",
+    actor_id: profileResult.profile.id,
+    metadata: { reason: "Dispute opened by user" },
+    created_at: new Date().toISOString()
+  });
+
+  await sendArbitrationAlert(id, deal.title, eventsHistory);
 
   return apiOk({ dealId: id, status: "disputed", auditEvent: "deal_disputed" });
 }

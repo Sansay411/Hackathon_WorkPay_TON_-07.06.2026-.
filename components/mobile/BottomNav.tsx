@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { BriefcaseBusiness, Home, Plus, Search, UserRound } from "lucide-react";
 import { FloatingActionButton } from "@/components/mobile/FloatingActionButton";
 import { useLanguage } from "@/components/language-provider";
+import { useTelegram } from "@/components/telegram-provider";
 
 type BottomNavItem = {
   href: Route;
@@ -15,17 +16,19 @@ type BottomNavItem = {
   center?: boolean;
 };
 
-const items: BottomNavItem[] = [
-  { href: "/", labelKey: "home", icon: Home },
-  { href: "/marketplace", labelKey: "jobs", icon: Search },
-  { href: "/deals/new", labelKey: "create", icon: Plus, center: true },
-  { href: "/deals", labelKey: "deals", icon: BriefcaseBusiness },
-  { href: "/profile", labelKey: "profile", icon: UserRound }
-];
-
 export function BottomNav() {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const { profile } = useTelegram();
+  const activeRole = profile?.activeRole ?? "client";
+
+  const items: BottomNavItem[] = [
+    { href: "/" as Route, labelKey: "home", icon: Home },
+    { href: (activeRole === "freelancer" ? "/marketplace" : "/jobs") as Route, labelKey: "jobs", icon: Search },
+    { href: "/deals/new" as Route, labelKey: "create", icon: Plus, center: true },
+    { href: "/deals" as Route, labelKey: "deals", icon: BriefcaseBusiness },
+    { href: "/profile" as Route, labelKey: "profile", icon: UserRound }
+  ];
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[390px] px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">

@@ -1,26 +1,47 @@
 import { apiError, apiOk } from "@/lib/api/errors";
 import { jobSelect, legacyJobSelect, mapJobRow } from "@/lib/api/jobs";
 import { jobCreateSchema } from "@/lib/api/validation";
-import { demoJobs } from "@/lib/demo/data";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/server";
 import { getVerifiedProfile } from "@/lib/api/profile";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const my = url.searchParams.get("my") === "true";
+  const initData = url.searchParams.get("initData");
+
   const supabase = createSupabaseServiceRoleClient();
   if (supabase) {
-    const result = await supabase.from("jobs").select(jobSelect).order("created_at", { ascending: false });
+    let query = supabase.from("jobs").select(jobSelect);
+
+    if (my && initData) {
+      const profileResult = await getVerifiedProfile(initData);
+      if (profileResult.status === "ready") {
+        query = query.eq("client_id", profileResult.profile.id);
+      } else {
+        return apiError("unauthorized", "Authentication failed.", 401);
+      }
+    }
+
+    const result = await query.order("created_at", { ascending: false });
     let data: Record<string, unknown>[] | null = result.data;
     let error = result.error;
     if (error?.message.includes("deliverables") || error?.message.includes("acceptance_criteria")) {
-      const legacy = await supabase.from("jobs").select(legacyJobSelect).order("created_at", { ascending: false });
+      let legacyQuery = supabase.from("jobs").select(legacyJobSelect);
+      if (my && initData) {
+        const profileResult = await getVerifiedProfile(initData);
+        if (profileResult.status === "ready") {
+          legacyQuery = legacyQuery.eq("client_id", profileResult.profile.id);
+        }
+      }
+      const legacy = await legacyQuery.order("created_at", { ascending: false });
       data = legacy.data;
       error = legacy.error;
     }
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
       return apiOk({ jobs: data.map((row) => mapJobRow(row)) });
     }
   }
-  return apiOk({ jobs: demoJobs });
+  return apiOk({ jobs: [] });
 }
 
 export async function POST(request: Request) {

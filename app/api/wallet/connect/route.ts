@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     .update({ wallet_address: parsed.data.walletAddress })
     .eq("id", profileResult.profile.id)
     .select(
-      "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance"
+      "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance, active_role, subscription_until, subscription_tier, connects_balance, ton_balance"
     )
     .single();
 

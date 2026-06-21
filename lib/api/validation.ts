@@ -15,7 +15,8 @@ export const profileUpdateSchema = z.object({
   portfolioChannel: z.string().url().optional(),
   githubUrl: z.string().url().optional(),
   linkedinUrl: z.string().url().optional(),
-  websiteUrl: z.string().url().optional()
+  websiteUrl: z.string().url().optional(),
+  activeRole: z.enum(["client", "freelancer"]).optional()
 });
 
 export const walletConnectSchema = z.object({

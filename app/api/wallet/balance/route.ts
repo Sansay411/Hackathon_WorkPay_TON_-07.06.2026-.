@@ -1,5 +1,6 @@
 import { apiError, apiOk } from "@/lib/api/errors";
 import { getVerifiedProfile } from "@/lib/api/profile";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +17,31 @@ export async function GET(request: Request) {
     return apiError("unauthorized", profileResult.message, 401);
   }
 
-  // We return 0 balance and empty transactions since legacy user profile balance tracking
-  // was deleted. All payments are now directly processed and escrowed per deal.
+  const supabase = createSupabaseServiceRoleClient();
+  let transactions: unknown[] = [];
+  if (supabase) {
+    const { data } = await supabase
+      .from("deposit_transactions")
+      .select("id, amount, tx_hash, created_at, network")
+      .eq("profile_id", profileResult.profile.id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (data) {
+      transactions = data.map((t) => ({
+        id: t.id,
+        amount: String(t.amount),
+        asset: "TON",
+        type: "ton_deposit",
+        reason: "Custodial deposit to platform balance",
+        txHash: t.tx_hash,
+        createdAt: t.created_at
+      }));
+    }
+  }
+
   return apiOk({
-    balanceTon: 0,
+    balanceTon: profileResult.profile.tonBalance ?? 0,
     walletAddress: profileResult.profile.walletAddress,
-    transactions: []
+    transactions
   });
 }

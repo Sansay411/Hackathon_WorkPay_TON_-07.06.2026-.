@@ -42,6 +42,10 @@ export const demoProfile: Profile = {
   successRate: 98,
   energyBalance: 19,
   tonBalance: 0,
+  activeRole: "freelancer",
+  subscriptionUntil: null,
+  subscriptionTier: "free",
+  connectsBalance: 30,
   createdAt: new Date("2026-06-01T10:00:00Z").toISOString(),
   updatedAt: new Date("2026-06-05T10:00:00Z").toISOString()
 };

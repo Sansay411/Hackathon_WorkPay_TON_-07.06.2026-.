@@ -43,6 +43,10 @@ export type TelegramSyncedProfile = {
   walletAddress: string | null;
   energyBalance: number;
   tonBalance: number;
+  activeRole: "client" | "freelancer";
+  subscriptionUntil: string | null;
+  subscriptionTier: string | null;
+  connectsBalance: number;
 };
 
 type TelegramContextValue = {

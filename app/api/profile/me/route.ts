@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         { onConflict: "telegram_id" }
       )
       .select(
-        "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance, created_at, updated_at"
+        "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance, active_role, subscription_until, subscription_tier, connects_balance, created_at, updated_at"
       )
       .single();
 
@@ -80,6 +80,10 @@ export async function POST(request: Request) {
         successRate: Number(data.success_rate ?? 0),
         energyBalance: Number(data.energy_balance ?? 20),
         tonBalance: 0,
+        activeRole: data.active_role === "freelancer" ? "freelancer" : "client",
+        subscriptionUntil: typeof data.subscription_until === "string" ? data.subscription_until : null,
+        subscriptionTier: typeof data.subscription_tier === "string" ? data.subscription_tier : null,
+        connectsBalance: typeof data.connects_balance === "number" ? data.connects_balance : 30,
         createdAt: data.created_at,
         updatedAt: data.updated_at
       },

@@ -18,6 +18,10 @@ export type Profile = {
   successRate?: number;
   energyBalance?: number;
   tonBalance?: number;
+  activeRole?: "client" | "freelancer";
+  subscriptionUntil?: string | null;
+  subscriptionTier?: string | null;
+  connectsBalance?: number;
   createdAt: string;
   updatedAt: string;
 };
