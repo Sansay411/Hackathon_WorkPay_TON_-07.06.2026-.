@@ -6,7 +6,7 @@ export async function GET() {
       {
         id: "notification-demo",
         type: "job",
-        title: "Mira review ready",
+        title: "Job update",
         body: "Your job terms are clear enough to publish.",
         isRead: false
       }

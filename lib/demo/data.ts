@@ -86,7 +86,7 @@ export const demoJobs: MarketplaceJob[] = [
     clientId: "demo-client",
     title: "Make my bot and app perfect urgently",
     description:
-      "Need someone to fix everything in my Telegram bot, Mini App, TON payments, STON.fi, Mira, Supabase, design, deployment, and all bugs very fast. I will explain details later. Must be perfect and ready today.",
+      "Need someone to fix everything in my Telegram bot, Mini App, TON payments, Supabase, design, deployment, and all bugs very fast. I will explain details later. Must be perfect and ready today.",
     category: "Unclear Scope",
     budgetAmount: "180",
     budgetToken: "TON",

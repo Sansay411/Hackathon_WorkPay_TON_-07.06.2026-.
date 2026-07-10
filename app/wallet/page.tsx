@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { ArrowLeftRight, ShieldCheck, WalletCards } from "lucide-react";
+import { ShieldCheck, WalletCards } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import { WalletConnectCard } from "@/components/wallet-connect-card";
 import { MobileShell } from "@/components/mobile/MobileShell";
-import { PaymentStatusCard } from "@/components/mobile/PaymentStatusCard";
+import { TonDepositCard } from "@/components/mobile/TonDepositCard";
 import { WalletMiniCard } from "@/components/mobile/WalletMiniCard";
 import { useTelegram } from "@/components/telegram-provider";
+import { getTonNetwork } from "@/lib/ton/network";
 
 export default function WalletPage() {
   const { t } = useLanguage();
   const { initData } = useTelegram();
+  const network = getTonNetwork();
   const [tonBalance, setTonBalance] = useState<number | null>(null);
 
   const fetchBalance = useCallback(() => {
@@ -55,14 +57,14 @@ export default function WalletPage() {
             </div>
             <div className="rounded-[22px] bg-white/10 p-3">
               <p className="text-xs text-white/60">{t.wallet.network}</p>
-              <p className="mt-1 text-lg font-black">Testnet</p>
+              <p className="mt-1 text-lg font-black">{network === "mainnet" ? "Mainnet" : "Testnet"}</p>
             </div>
           </div>
         </section>
 
         <WalletConnectCard />
         <WalletMiniCard />
-        <PaymentStatusCard dealId="wallet-readiness" amount="1" asset="TON" onVerifiedDeposit={(balance) => { setTonBalance(balance); fetchBalance(); }} />
+        <TonDepositCard balanceTon={tonBalance ?? 0} network={network} onBalanceChange={(balance) => { setTonBalance(balance); fetchBalance(); }} />
 
         <section className="grid grid-cols-2 gap-3">
           <div className="rounded-[26px] border border-white/70 bg-[#ffffff] p-4 shadow-[0_12px_30px_rgba(17,24,15,0.08)]">
@@ -71,9 +73,9 @@ export default function WalletPage() {
             <p className="mt-1 text-xs font-medium leading-5 text-[#64748b]">{t.wallet.noManualConfirmation}</p>
           </div>
           <div className="rounded-[26px] border border-white/70 bg-[#ffffff] p-4 shadow-[0_12px_30px_rgba(17,24,15,0.08)]">
-            <ArrowLeftRight className="mb-3 h-5 w-5 text-[#229ED9]" />
-            <p className="text-sm font-black">STON.fi</p>
-            <p className="mt-1 text-xs font-medium leading-5 text-[#64748b]">{t.wallet.swapPrepared}</p>
+            <WalletCards className="mb-3 h-5 w-5 text-[#229ED9]" />
+            <p className="text-sm font-black">TON transfer</p>
+            <p className="mt-1 text-xs font-medium leading-5 text-[#64748b]">Balance credits are released only after on-chain verification.</p>
           </div>
         </section>
       </div>

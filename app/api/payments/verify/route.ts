@@ -78,26 +78,16 @@ export async function POST(request: Request) {
   const clientProfile = deal.client as unknown as ProfileInfo | null;
   const freelancerProfile = deal.freelancer as unknown as ProfileInfo | null;
 
-  let verificationResult;
-  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
-    // In demo mode, bypass actual blockchain verification to ease testing
-    verificationResult = {
-      status: "confirmed" as const,
-      txHash: parsed.data.txHash,
-      amountNano: String(deal.price_amount)
-    };
-  } else {
-    const verifier = new ProviderBackedTonPaymentVerifier();
-    verificationResult = await verifier.verify({
-      txHash: parsed.data.txHash,
-      expectedEscrowWallet: escrowWallet,
-      expectedSenderWallet: clientProfile?.wallet_address || "",
-      expectedAmount: String(deal.price_amount),
-      expectedAsset: deal.price_token,
-      expectedComment: `workpay:${deal.id}`,
-      network: parsed.data.network
-    });
-  }
+  const verifier = new ProviderBackedTonPaymentVerifier();
+  const verificationResult = await verifier.verify({
+    txHash: parsed.data.txHash,
+    expectedEscrowWallet: escrowWallet,
+    expectedSenderWallet: clientProfile?.wallet_address || "",
+    expectedAmount: String(deal.price_amount),
+    expectedAsset: deal.price_token,
+    expectedComment: `workpay:${deal.id}`,
+    network: parsed.data.network
+  });
 
   if (verificationResult.status !== "confirmed") {
     return apiError(

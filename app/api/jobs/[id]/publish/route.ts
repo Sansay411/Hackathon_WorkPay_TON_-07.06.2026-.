@@ -7,8 +7,5 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   if (!job) {
     return apiError("not_found", "Job not found.", 404);
   }
-  if (!job.aiScore) {
-    return apiError("conflict", "Run Mira review before publishing.", 409);
-  }
   return apiOk({ job: { ...job, status: "published" }, auditEvent: "job_published" });
 }

@@ -44,8 +44,7 @@ export const paymentCreateSchema = z.object({
   initData: z.string().optional(),
   dealId: z.string().min(1),
   asset: z.string().min(2).max(20),
-  amount: z.string().regex(/^\d+(\.\d{1,9})?$/).optional(),
-  paymentMode: z.enum(["direct_ton", "stonfi_swap"]).default("direct_ton")
+  amount: z.string().regex(/^\d+(\.\d{1,9})?$/).optional()
 });
 
 export const paymentVerifySchema = z.object({
@@ -54,19 +53,4 @@ export const paymentVerifySchema = z.object({
   txHash: z.string().min(40).max(200),
   walletAddress: z.string().min(20).optional(),
   network: z.enum(["testnet", "mainnet"]).default("testnet")
-});
-
-export const stonfiQuoteSchema = z.object({
-  fromAsset: z.string().min(2).max(20),
-  toAsset: z.string().min(2).max(20),
-  settlementAmount: z.string().regex(/^\d+(\.\d{1,9})?$/),
-  network: z.enum(["testnet", "mainnet"]).default("mainnet"),
-  dealId: z.string().min(1).max(120).optional()
-});
-
-export const stonfiSwapSchema = z.object({
-  initData: z.string().optional(),
-  dealId: z.string().min(1).max(120),
-  quoteId: z.string().min(1).max(200),
-  network: z.enum(["testnet", "mainnet"]).default("mainnet")
 });

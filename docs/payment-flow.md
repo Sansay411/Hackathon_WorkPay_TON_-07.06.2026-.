@@ -1,29 +1,17 @@
-# Payment Flow
+# TON payment flow
 
-WorkPay does not include fake payment confirmation.
+## Deposit
 
-## Funding
+1. The wallet page requests a direct TON transaction from `/api/payments/create` using `deposit:<profileId>` as the comment.
+2. TON Connect opens the user's wallet for approval.
+3. The client polls `/api/wallet/deposit/scan` while the transaction is indexed.
+4. The server calls TON Center, verifies the transaction and then credits `profiles.ton_balance` through `/api/wallet/deposit`.
+5. `deposit_transactions.tx_hash` is unique, so the same transaction cannot be credited twice.
 
-1. Client connects a TON wallet through TonConnect.
-2. App prepares a funding transaction for the selected network.
-3. Client signs and sends the transaction.
-4. Backend verifies the transaction through TonAPI or Toncenter.
-5. Verification checks transaction hash, source wallet, escrow destination, amount, asset, network, finality, and duplicate use.
-6. Deal transitions from `waiting_payment` or `swap_pending` to `funded`.
+## Deal funding
 
-## Release
+Deal funding uses the same direct TON transfer mechanism with the `workpay:<dealId>` comment. A payment is confirmed only after server-side TON verification.
 
-1. Freelancer submits delivery.
-2. Client approves.
-3. App prepares escrow release.
-4. TON transaction is submitted through the real escrow contract or release wallet flow.
-5. Backend verifies release transaction.
-6. Deal transitions to `completed`.
+## Release safety
 
-## STON.fi
-
-When the client funds with an unsupported asset, STON.fi Omniston can provide quote and swap routing into a supported settlement asset. Swap state must be tracked separately and cannot mark a deal funded until the escrow receives verified funds.
-
-## No Manual Override
-
-Production must not include manual payment confirmation, admin-entered transaction success, or mock blockchain verification.
+Escrow release requires a server-side signing policy and an auditable payout record. Until the signing key and operational policy are configured, the release route returns a setup-required response instead of claiming a payout happened.

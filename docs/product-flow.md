@@ -1,16 +1,17 @@
-# Product Flow
+# WorkPay product flow
 
-WorkPay is a Telegram Mini App marketplace for secure freelance work on TON.
+WorkPay is distributed through Telegram and uses Telegram WebApp authentication for every protected action.
 
-1. User opens `@GetWorkPayBot`.
-2. Bot launches the Mini App.
-3. User chooses language and role.
-4. User can browse without a wallet.
-5. TON wallet is required for applying, accepting, funding, settlement, and reputation.
-6. Client creates a job.
-7. Mira reviews clarity and dispute risk.
-8. Freelancer applies with Energy.
-9. Client accepts application and a deal is created.
-10. Payment is prepared through direct TON or STON.fi swap flow.
-11. Funded state requires real TON verification.
-12. Release and completion require release transaction architecture.
+## Marketplace
+
+- Clients publish jobs with a budget, deadline and acceptance criteria.
+- Freelancers browse jobs and spend one Connect per application.
+- Clients accept an application and a protected deal is created.
+- Deliverables move through submitted, approved and completed states.
+
+## Trust model
+
+- Telegram `initData` is verified server-side.
+- Wallet addresses are stored only after a Telegram-authenticated wallet connection.
+- TON transfers are checked against the expected sender, escrow destination, amount and comment.
+- Internal balances are credited only after chain verification.

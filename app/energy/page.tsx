@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Zap } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 import { useTelegram } from "@/components/telegram-provider";
@@ -95,10 +96,6 @@ export default function EnergyPage() {
       setTonBalance(payload.data.tonBalance);
       setStatusMsg(`Successfully purchased ${pkg.label}!`);
       
-      // Reload page after a delay to refresh the global state
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
     } catch {
       setStatusMsg("Failed to connect to server.");
     } finally {
@@ -110,10 +107,10 @@ export default function EnergyPage() {
     <MobileShell>
       <div className="space-y-5">
         <header>
-          <p className="text-sm font-black text-[#229ED9]">Monetization & Limits</p>
-          <h1 className="mt-1 text-[34px] font-black leading-none tracking-normal">Buy Connects</h1>
+          <p className="text-sm font-black text-[#2185a4]">Marketplace credits</p>
+          <h1 className="mt-1 text-[34px] font-black leading-none tracking-[-0.04em]">Buy Connects</h1>
           <p className="mt-2 text-sm font-medium leading-6 text-[#64748b]">
-            Freelancers use connects to apply to jobs. Buy more connects instantly using your custodial TON balance.
+            One Connect unlocks one application. Packages are paid from your verified TON balance and credited instantly.
           </p>
         </header>
 
@@ -130,7 +127,7 @@ export default function EnergyPage() {
             </p>
           </div>
           <p className="text-xs text-[#64748b] leading-tight max-w-[200px] text-right">
-            To increase your balance, go to the Wallet tab and tap the &quot;+&quot; deposit button.
+            Add funds from the Wallet tab. <Link href="/wallet" className="font-black text-[#2185a4] underline decoration-[#43bee6] underline-offset-2">Open wallet</Link>
           </p>
         </div>
 
@@ -157,7 +154,7 @@ export default function EnergyPage() {
               key={item.id}
               type="button"
             >
-              <Zap className="h-6 w-6 text-[#229ED9] animate-pulse" />
+              <Zap className="h-6 w-6 text-[#43bee6]" />
               <p className="mt-2 text-sm font-black text-[#171c20]">{item.label}</p>
               <p className="mt-1 text-xs font-bold text-[#00658e]">{item.priceTon} TON</p>
               <span className="mt-3 w-full rounded-xl bg-[#e6f7ff] py-1 text-[10px] font-black text-[#00658e]">

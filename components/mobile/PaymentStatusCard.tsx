@@ -107,7 +107,7 @@ export function PaymentStatusCard({ dealId, amount, asset, onVerifiedDeposit }: 
               const response = await fetch("/api/payments/create", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ initData, dealId, amount, asset, paymentMode: "direct_ton" })
+                body: JSON.stringify({ initData, dealId, amount, asset })
               });
               const payload = (await response.json()) as PaymentCreateResponse;
               if (!response.ok || !payload.ok || !payload.data?.transaction) {

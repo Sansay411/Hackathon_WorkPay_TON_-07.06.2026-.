@@ -52,25 +52,16 @@ export async function POST(request: Request) {
     return apiError("conflict", "This deposit transaction has already been credited.", 409);
   }
 
-  let verificationResult;
-  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
-    verificationResult = {
-      status: "confirmed" as const,
-      txHash,
-      amountNano: String(parseFloat(amount) * 1e9)
-    };
-  } else {
-    const verifier = new ProviderBackedTonPaymentVerifier();
-    verificationResult = await verifier.verify({
-      txHash,
-      expectedEscrowWallet: escrowWallet,
-      expectedSenderWallet: profile.walletAddress,
-      expectedAmount: amount,
-      expectedAsset: "TON",
-      expectedComment: `deposit:${profile.id}`,
-      network
-    });
-  }
+  const verifier = new ProviderBackedTonPaymentVerifier();
+  const verificationResult = await verifier.verify({
+    txHash,
+    expectedEscrowWallet: escrowWallet,
+    expectedSenderWallet: profile.walletAddress,
+    expectedAmount: amount,
+    expectedAsset: "TON",
+    expectedComment: `deposit:${profile.id}`,
+    network
+  });
 
   if (verificationResult.status !== "confirmed") {
     return apiError("bad_request", "Transaction verification failed on-chain.", 400);

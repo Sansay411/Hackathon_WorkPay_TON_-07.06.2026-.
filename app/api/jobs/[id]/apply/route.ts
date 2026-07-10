@@ -36,13 +36,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return apiError("setup_required", "Supabase service role is required for applications.", 503);
   }
 
-  // 2. Verify Active Paid Subscription
-  const hasSubscription = profile.subscriptionUntil && new Date(profile.subscriptionUntil) > new Date();
-  if (!hasSubscription) {
-    return apiError("forbidden", "An active paid subscription is required to apply for jobs on the marketplace.", 403);
-  }
-
-  // 3. Verify Connects Balance
+  // Connects are the platform's pay-per-application unit.
   if (profile.connectsBalance < 1) {
     return apiError("insufficient_connects", "You do not have enough connects to apply to this job.", 400);
   }

@@ -111,7 +111,7 @@ function FinderHero() {
       <div className="relative mt-5 flex flex-wrap gap-2">
         <StatusPill icon={<CheckCircle2 className="h-3.5 w-3.5" />} label={t.home.tonSecured} />
         <StatusPill icon={<Sparkles className="h-3.5 w-3.5" />} label={t.home.aiReviewed} accent />
-        <StatusPill icon={<WalletCards className="h-3.5 w-3.5" />} label={t.home.stonfiReady} />
+        <StatusPill icon={<WalletCards className="h-3.5 w-3.5" />} label="TON escrow ready" />
       </div>
     </section>
   );
@@ -231,7 +231,7 @@ function AgentPulse() {
           </div>
           <p className="mt-2 max-w-[235px] text-xs font-medium leading-5 text-white/65">{t.home.description}</p>
         </div>
-        <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[#b9edf8]">Mira</span>
+        <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[#b9edf8]">TON escrow</span>
       </div>
       <Link className="relative mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#43bee6] px-3.5 py-2 text-[11px] font-black text-white shadow-[0_9px_22px_rgba(25,143,187,.2)]" href="/jobs">
         {t.home.findWork}
