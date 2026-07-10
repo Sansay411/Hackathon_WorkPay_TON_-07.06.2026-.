@@ -11,16 +11,26 @@ type TelegramUserPayload = {
   language_code?: string;
 };
 
+type TelegramThemeParams = Record<string, string>;
+
 type TelegramWebApp = {
   initData: string;
   initDataUnsafe?: {
     user?: TelegramUserPayload;
   };
+  version?: string;
+  platform?: string;
   colorScheme?: "light" | "dark";
+  themeParams?: TelegramThemeParams;
   ready: () => void;
   expand: () => void;
   setHeaderColor?: (color: string) => void;
+  setBackgroundColor?: (color: string) => void;
+  setBottomBarColor?: (color: string) => void;
+  enableVerticalSwipes?: () => void;
   openTelegramLink?: (url: string) => void;
+  onEvent?: (eventName: string, callback: () => void) => void;
+  offEvent?: (eventName: string, callback: () => void) => void;
 };
 
 export type VerifiedTelegramUser = {
@@ -49,7 +59,10 @@ export type TelegramSyncedProfile = {
   connectsBalance: number;
 };
 
+export type TelegramRuntime = "loading" | "telegram" | "outside";
+
 type TelegramContextValue = {
+  runtime: TelegramRuntime;
   isTelegram: boolean;
   initData: string;
   colorScheme: "light" | "dark";
@@ -58,14 +71,17 @@ type TelegramContextValue = {
   profile: TelegramSyncedProfile | null;
 };
 
-const TelegramContext = createContext<TelegramContextValue>({
+const defaultContext: TelegramContextValue = {
+  runtime: "loading",
   isTelegram: false,
   initData: "",
   colorScheme: "light",
   authStatus: "idle",
   user: null,
   profile: null
-});
+};
+
+const TelegramContext = createContext<TelegramContextValue>(defaultContext);
 
 declare global {
   interface Window {
@@ -76,19 +92,28 @@ declare global {
 }
 
 export function TelegramProvider({ children }: { children: React.ReactNode }) {
-  const [value, setValue] = useState<TelegramContextValue>({
-    isTelegram: false,
-    initData: "",
-    colorScheme: "light",
-    authStatus: "idle",
-    user: null,
-    profile: null
-  });
+  const [value, setValue] = useState<TelegramContextValue>(defaultContext);
 
   useEffect(() => {
     let cancelled = false;
     let attempts = 0;
     let controller: AbortController | null = null;
+    let activeWebApp: TelegramWebApp | null = null;
+
+    const syncTheme = () => {
+      if (!activeWebApp) {
+        return;
+      }
+
+      const colorScheme = applyTelegramChrome(activeWebApp);
+      setValue((current) => ({ ...current, colorScheme }));
+    };
+
+    const markOutsideTelegram = () => {
+      if (!cancelled) {
+        setValue({ ...defaultContext, runtime: "outside", authStatus: "unavailable" });
+      }
+    };
 
     const syncTelegram = () => {
       if (cancelled) {
@@ -98,25 +123,33 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
       const webApp = window.Telegram?.WebApp;
       if (!webApp) {
         attempts += 1;
-        if (attempts < 20) {
+        if (attempts < 30) {
           window.setTimeout(syncTelegram, 100);
           return;
         }
-        setValue((current) => ({ ...current, authStatus: "unavailable" }));
+        markOutsideTelegram();
         return;
       }
 
+      const initData = webApp.initData || readTelegramInitDataFromUrl();
+      if (!isTelegramRuntime(webApp, initData)) {
+        markOutsideTelegram();
+        return;
+      }
+
+      activeWebApp = webApp;
       webApp.ready();
       webApp.expand();
-      webApp.setHeaderColor?.("#0ea5e9");
+      webApp.enableVerticalSwipes?.();
+      const colorScheme = applyTelegramChrome(webApp);
+      webApp.onEvent?.("themeChanged", syncTheme);
 
-      const initData = webApp.initData || readTelegramInitDataFromUrl();
       const displayUser = getDisplayUser(webApp);
-
       setValue({
+        runtime: "telegram",
         isTelegram: true,
         initData,
-        colorScheme: webApp.colorScheme ?? "light",
+        colorScheme,
         authStatus: initData ? "verifying" : "unavailable",
         user: displayUser,
         profile: null
@@ -142,6 +175,9 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
           return (await response.json()) as { data?: { user?: VerifiedTelegramUser; profile?: TelegramSyncedProfile } };
         })
         .then((payload) => {
+          if (cancelled) {
+            return;
+          }
           setValue((current) => ({
             ...current,
             authStatus: "verified",
@@ -150,7 +186,7 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
           }));
         })
         .catch((error: unknown) => {
-          if (error instanceof DOMException && error.name === "AbortError") {
+          if (cancelled || (error instanceof DOMException && error.name === "AbortError")) {
             return;
           }
           setValue((current) => ({ ...current, authStatus: "error", user: current.user }));
@@ -162,6 +198,7 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
       controller?.abort();
+      activeWebApp?.offEvent?.("themeChanged", syncTheme);
     };
   }, []);
 
@@ -180,6 +217,30 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
 
 export function useTelegram() {
   return useContext(TelegramContext);
+}
+
+function isTelegramRuntime(webApp: TelegramWebApp, initData: string) {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const searchParams = new URLSearchParams(window.location.search);
+  const launchParamNames = ["tgWebAppVersion", "tgWebAppPlatform", "tgWebAppThemeParams", "tgWebAppData"];
+  const hasLaunchParams = launchParamNames.some((name) => hashParams.has(name) || searchParams.has(name));
+  const platform = webApp.platform?.toLowerCase();
+  const hasTelegramPlatform = Boolean(platform && platform !== "unknown" && webApp.version);
+  return Boolean(initData || hasLaunchParams || hasTelegramPlatform);
+}
+
+function applyTelegramChrome(webApp: TelegramWebApp) {
+  const theme = webApp.themeParams ?? {};
+  const backgroundColor = theme.bg_color ?? "#f2f7fa";
+  const secondaryBackgroundColor = theme.secondary_bg_color ?? "#ffffff";
+  document.documentElement.style.setProperty("--tg-bg-color", backgroundColor);
+  document.documentElement.style.setProperty("--tg-secondary-bg-color", secondaryBackgroundColor);
+  document.documentElement.style.setProperty("--tg-text-color", theme.text_color ?? "#17272f");
+  document.documentElement.style.setProperty("--tg-hint-color", theme.hint_color ?? "#71838c");
+  webApp.setHeaderColor?.(backgroundColor);
+  webApp.setBackgroundColor?.(backgroundColor);
+  webApp.setBottomBarColor?.(theme.bottom_bar_bg_color ?? secondaryBackgroundColor);
+  return webApp.colorScheme === "dark" ? "dark" : "light";
 }
 
 function getDisplayUser(webApp: TelegramWebApp): VerifiedTelegramUser | null {

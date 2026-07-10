@@ -22,6 +22,10 @@
   --border: 214 32% 91%;
   --input: 214 32% 91%;
   --ring: 199 89% 48%;
+  --tg-bg-color: #f2f7fa;
+  --tg-secondary-bg-color: #ffffff;
+  --tg-text-color: #17272f;
+  --tg-hint-color: #71838c;
 }
 
 .dark {
@@ -56,6 +60,9 @@ body {
   color: hsl(var(--foreground));
   letter-spacing: -0.01em;
   font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-x: none;
   background:
     radial-gradient(circle at 8% 4%, rgba(136, 218, 241, .26), transparent 24rem),
     radial-gradient(circle at 94% 18%, rgba(196, 229, 242, .48), transparent 28rem),
@@ -103,6 +110,17 @@ body::after {
 .workpay-content {
   position: relative;
   z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 ::selection {

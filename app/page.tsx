@@ -30,8 +30,8 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("");
   const categories = t.marketplace.categories;
-  const selectedCategory = categories.includes(activeCategory) ? activeCategory : categories[0];
-  const categoryIndex = categories.indexOf(selectedCategory);
+  const selectedCategory = (categories as readonly string[]).includes(activeCategory) ? activeCategory : categories[0];
+  const categoryIndex = (categories as readonly string[]).indexOf(selectedCategory);
   const categoryNeedle = ["", "design", "telegram", "backend", "ton"][categoryIndex] ?? "";
 
   useEffect(() => {
@@ -157,7 +157,7 @@ function SearchPanel({
   query
 }: {
   activeCategory: string;
-  categories: string[];
+  categories: readonly string[];
   onCategoryChange: (value: string) => void;
   onQueryChange: (value: string) => void;
   query: string;
