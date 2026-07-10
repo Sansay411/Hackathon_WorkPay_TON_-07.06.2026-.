@@ -28,7 +28,7 @@ async function runDaemon() {
   let keyPair: { publicKey: Buffer; secretKey: Buffer };
   try {
     keyPair = await mnemonicToWalletKey(mnemonic.trim().split(/\s+/));
-  } catch (err) {
+  } catch {
     throw new Error("[Payout Daemon] Critical Error: Invalid ESCROW_WALLET_MNEMONIC seed phrase.");
   }
 
@@ -93,7 +93,7 @@ async function runDaemon() {
       let recipientAddress;
       try {
         recipientAddress = Address.parse(payout.recipient_wallet);
-      } catch (err) {
+      } catch {
         console.error(`[Payout Daemon] Invalid recipient address: ${payout.recipient_wallet}. Rejecting payout.`);
         await failPayout(payout.id, "Invalid recipient TON address format.");
         return;

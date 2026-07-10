@@ -1,50 +1,48 @@
 "use client";
 
+import { Sparkles, Zap } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 
 export function ConnectsWidget({ connects, subscriptionUntil }: { connects: number; subscriptionUntil: string | null }) {
-  const { t } = useLanguage();
-  const maxConnects = 30;
-  const percentage = Math.max(0, Math.min(100, (connects / maxConnects) * 100));
+  const { language } = useLanguage();
+  const ru = language === "ru";
+  const visualMax = Math.max(30, Math.ceil(Math.max(connects, 1) / 10) * 10);
+  const percentage = Math.max(0, Math.min(100, (connects / visualMax) * 100));
 
-  let daysLeft = 30;
+  let renewal = ru ? "Доступны, пока не потрачены" : "Available until spent";
   if (subscriptionUntil) {
-    const diffTime = new Date(subscriptionUntil).getTime() - new Date().getTime();
-    daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    const renewalDate = new Date(subscriptionUntil).toLocaleDateString(ru ? "ru-RU" : "en-US", {
+      day: "numeric",
+      month: "short"
+    });
+    renewal = ru
+      ? `Обновление ${renewalDate}`
+      : `Renews ${renewalDate}`;
   }
 
-  // Choose appropriate Russian translation format if language is 'ru', otherwise English
-  const isRu = typeof window !== "undefined" && window.localStorage.getItem("workpay:language") === "ru";
-  const connectsLabel = isRu
-    ? `Коннекты: Осталось ${connects} из ${maxConnects}`
-    : `Connects: ${connects} of ${maxConnects} remaining`;
-  
-  const updateLabel = isRu
-    ? `Обновление через ${daysLeft} ${daysLeft === 1 ? "день" : daysLeft > 1 && daysLeft < 5 ? "дня" : "дней"}`
-    : `Renewal in ${daysLeft} ${daysLeft === 1 ? "day" : "days"}`;
-
   return (
-    <div className="rounded-[28px] border border-[#dfe3e8] bg-white p-5 shadow-[0_12px_32px_rgba(0,101,142,0.08)]">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs font-bold text-[#64748b] uppercase tracking-wider">
-            {isRu ? "Мощность откликов" : "Apply Energy"}
-          </p>
-          <h3 className="mt-1 text-lg font-black text-[#171c20]">
-            {connectsLabel}
-          </h3>
+    <div className="overflow-hidden rounded-[28px] border border-white/75 bg-white/[0.75] shadow-[0_18px_50px_rgba(41,91,116,0.1)] backdrop-blur-xl">
+      <div className="bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.24),transparent_48%),linear-gradient(145deg,rgba(255,255,255,0.95),rgba(238,250,252,0.72))] p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-cyan-700">
+              <Zap className="h-3.5 w-3.5 fill-current" />
+              {ru ? "Баланс откликов" : "Proposal balance"}
+            </p>
+            <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-slate-950">{connects}</p>
+            <p className="mt-1 text-xs font-bold text-slate-500">Connects</p>
+          </div>
+          <span className="inline-flex items-center gap-1 rounded-full border border-white bg-white/70 px-2.5 py-1.5 text-[10px] font-black text-slate-500">
+            <Sparkles className="h-3.5 w-3.5 text-cyan-600" />
+            {renewal}
+          </span>
         </div>
-        <div className="text-right">
-          <p className="text-xs font-semibold text-[#229ED9]">
-            {updateLabel}
-          </p>
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/80">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-[width] duration-500 ease-out"
+            style={{ width: `${percentage}%` }}
+          />
         </div>
-      </div>
-      <div className="mt-4 h-2.5 w-full rounded-full bg-[#f1f5f9] overflow-hidden">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-[#229ED9] to-[#00658e] transition-all duration-500"
-          style={{ width: `${percentage}%` }}
-        />
       </div>
     </div>
   );

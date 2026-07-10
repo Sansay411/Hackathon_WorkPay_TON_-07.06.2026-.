@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     return apiError("bad_request", "Invalid job payload.", 400);
   }
 
-  const { initData, title, description, category, budgetAmount, budgetToken, deadline } = parsed.data;
+  const { initData, title, description, category, budgetAmount, budgetToken, deadline, deliverables, acceptanceCriteria } = parsed.data;
 
   const profileResult = await getVerifiedProfile(initData);
   if (profileResult.status === "telegram_required") {
@@ -109,6 +109,8 @@ export async function POST(request: Request) {
       budget_amount: parseFloat(budgetAmount),
       budget_token: budgetToken,
       deadline: deadline ? new Date(deadline).toISOString() : null,
+      deliverables: deliverables ?? [],
+      acceptance_criteria: acceptanceCriteria ?? [],
       status: "published"
     })
     .select()

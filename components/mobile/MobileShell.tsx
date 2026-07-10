@@ -10,8 +10,12 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
       <main className="workpay-main overflow-x-hidden text-[#17272f]">
         <motion.div
           animate={{ opacity: 1, y: 0 }}
-          className="workpay-content relative mx-auto min-h-[100dvh] w-full max-w-[430px] px-5 pb-[calc(7.25rem+env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
+          className="workpay-content relative mx-auto min-h-[100dvh] w-full max-w-[430px] px-5"
           initial={{ opacity: 0, y: 10 }}
+          style={{
+            paddingTop: "max(1rem, env(safe-area-inset-top), var(--tg-content-safe-area-top, 0px))",
+            paddingBottom: "calc(7.25rem + max(env(safe-area-inset-bottom), var(--tg-content-safe-area-bottom, 0px)))"
+          }}
           transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
         >
           <DemoBanner />

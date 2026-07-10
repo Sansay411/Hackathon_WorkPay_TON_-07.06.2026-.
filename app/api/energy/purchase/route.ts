@@ -2,6 +2,7 @@ import { apiError, apiOk } from "@/lib/api/errors";
 import { getVerifiedProfile } from "@/lib/api/profile";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { getConnectPackage } from "@/lib/monetization/connect-packages";
 
 const purchaseSchema = z.object({
   initData: z.string(),
@@ -26,19 +27,10 @@ export async function POST(request: Request) {
     return apiError("forbidden", "Only freelancers can purchase connects packages.", 403);
   }
 
-  let connectsToAdd = 0;
-  let priceTon = 0;
-
-  if (packageId === "pkg_10") {
-    connectsToAdd = 10;
-    priceTon = 1.0;
-  } else if (packageId === "pkg_30") {
-    connectsToAdd = 30;
-    priceTon = 2.5;
-  } else if (packageId === "pkg_100") {
-    connectsToAdd = 100;
-    priceTon = 7.0;
-  }
+  const pack = getConnectPackage(packageId);
+  if (!pack) return apiError("bad_request", "Unknown Connects package.", 400);
+  const connectsToAdd = pack.connects;
+  const priceTon = pack.priceTon;
 
   const supabase = createSupabaseServiceRoleClient();
   if (!supabase) {

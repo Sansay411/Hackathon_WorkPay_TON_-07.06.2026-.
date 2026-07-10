@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         { onConflict: "telegram_id" }
       )
       .select(
-        "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance, active_role, subscription_until, subscription_tier, connects_balance, created_at, updated_at"
+        "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, portfolio_channel, github_url, linkedin_url, website_url, rating, completed_deals_count, success_rate, energy_balance, ton_balance, active_role, subscription_until, subscription_tier, connects_balance, created_at, updated_at"
       )
       .single();
 
@@ -75,11 +75,15 @@ export async function POST(request: Request) {
         bio: data.bio,
         skills: Array.isArray(data.skills) ? data.skills : [],
         hourlyRate: data.hourly_rate ? String(data.hourly_rate) : null,
+        portfolioChannel: data.portfolio_channel,
+        githubUrl: data.github_url,
+        linkedinUrl: data.linkedin_url,
+        websiteUrl: data.website_url,
         rating: Number(data.rating ?? 0),
         completedDealsCount: Number(data.completed_deals_count ?? 0),
         successRate: Number(data.success_rate ?? 0),
         energyBalance: Number(data.energy_balance ?? 20),
-        tonBalance: 0,
+        tonBalance: Number(data.ton_balance ?? 0),
         activeRole: data.active_role === "freelancer" ? "freelancer" : "client",
         subscriptionUntil: typeof data.subscription_until === "string" ? data.subscription_until : null,
         subscriptionTier: typeof data.subscription_tier === "string" ? data.subscription_tier : null,

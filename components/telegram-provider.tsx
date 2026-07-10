@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 type TelegramUserPayload = {
   id?: number;
@@ -12,6 +12,8 @@ type TelegramUserPayload = {
 };
 
 type TelegramThemeParams = Record<string, string>;
+type TelegramSafeArea = { top?: number; bottom?: number; left?: number; right?: number };
+export type TelegramInvoiceStatus = "paid" | "cancelled" | "failed" | "pending";
 
 type TelegramWebApp = {
   initData: string;
@@ -22,6 +24,8 @@ type TelegramWebApp = {
   platform?: string;
   colorScheme?: "light" | "dark";
   themeParams?: TelegramThemeParams;
+  safeAreaInset?: TelegramSafeArea;
+  contentSafeAreaInset?: TelegramSafeArea;
   ready: () => void;
   expand: () => void;
   setHeaderColor?: (color: string) => void;
@@ -29,6 +33,7 @@ type TelegramWebApp = {
   setBottomBarColor?: (color: string) => void;
   enableVerticalSwipes?: () => void;
   openTelegramLink?: (url: string) => void;
+  openInvoice?: (url: string, callback?: (status: TelegramInvoiceStatus) => void) => void;
   onEvent?: (eventName: string, callback: () => void) => void;
   offEvent?: (eventName: string, callback: () => void) => void;
 };
@@ -69,6 +74,7 @@ type TelegramContextValue = {
   authStatus: "idle" | "verifying" | "verified" | "unavailable" | "error";
   user: VerifiedTelegramUser | null;
   profile: TelegramSyncedProfile | null;
+  openInvoice?: (url: string) => Promise<TelegramInvoiceStatus>;
 };
 
 const defaultContext: TelegramContextValue = {
@@ -143,6 +149,8 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
       webApp.enableVerticalSwipes?.();
       const colorScheme = applyTelegramChrome(webApp);
       webApp.onEvent?.("themeChanged", syncTheme);
+      webApp.onEvent?.("safeAreaChanged", syncTheme);
+      webApp.onEvent?.("contentSafeAreaChanged", syncTheme);
 
       const displayUser = getDisplayUser(webApp);
       setValue({
@@ -199,6 +207,8 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
       controller?.abort();
       activeWebApp?.offEvent?.("themeChanged", syncTheme);
+      activeWebApp?.offEvent?.("safeAreaChanged", syncTheme);
+      activeWebApp?.offEvent?.("contentSafeAreaChanged", syncTheme);
     };
   }, []);
 
@@ -210,7 +220,16 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
     }
   }, [value.colorScheme]);
 
-  const contextValue = useMemo(() => value, [value]);
+  const openInvoice = useCallback((url: string) => new Promise<TelegramInvoiceStatus>((resolve, reject) => {
+    const webApp = window.Telegram?.WebApp;
+    if (!webApp?.openInvoice) {
+      reject(new Error("Telegram invoice API is unavailable"));
+      return;
+    }
+    webApp.openInvoice(url, resolve);
+  }), []);
+
+  const contextValue = useMemo(() => ({ ...value, openInvoice }), [openInvoice, value]);
 
   return <TelegramContext.Provider value={contextValue}>{children}</TelegramContext.Provider>;
 }
@@ -237,6 +256,10 @@ function applyTelegramChrome(webApp: TelegramWebApp) {
   document.documentElement.style.setProperty("--tg-secondary-bg-color", secondaryBackgroundColor);
   document.documentElement.style.setProperty("--tg-text-color", theme.text_color ?? "#17272f");
   document.documentElement.style.setProperty("--tg-hint-color", theme.hint_color ?? "#71838c");
+  document.documentElement.style.setProperty("--tg-safe-area-top", `${webApp.safeAreaInset?.top ?? 0}px`);
+  document.documentElement.style.setProperty("--tg-safe-area-bottom", `${webApp.safeAreaInset?.bottom ?? 0}px`);
+  document.documentElement.style.setProperty("--tg-content-safe-area-top", `${webApp.contentSafeAreaInset?.top ?? 0}px`);
+  document.documentElement.style.setProperty("--tg-content-safe-area-bottom", `${webApp.contentSafeAreaInset?.bottom ?? 0}px`);
   webApp.setHeaderColor?.(backgroundColor);
   webApp.setBackgroundColor?.(backgroundColor);
   webApp.setBottomBarColor?.(theme.bottom_bar_bg_color ?? secondaryBackgroundColor);

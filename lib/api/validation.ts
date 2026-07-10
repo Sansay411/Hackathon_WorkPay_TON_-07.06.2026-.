@@ -12,10 +12,10 @@ export const profileUpdateSchema = z.object({
   skills: z.array(z.string().min(1).max(60)).max(20).optional(),
   hourlyRate: z.string().regex(/^\d+(\.\d{1,2})?$/).optional(),
   walletAddress: z.string().refine(isLikelyTonAddress, { message: "Invalid TON wallet address" }).optional(),
-  portfolioChannel: z.string().url().optional(),
-  githubUrl: z.string().url().optional(),
-  linkedinUrl: z.string().url().optional(),
-  websiteUrl: z.string().url().optional(),
+  portfolioChannel: z.union([z.string().url(), z.literal("")]).optional(),
+  githubUrl: z.union([z.string().url(), z.literal("")]).optional(),
+  linkedinUrl: z.union([z.string().url(), z.literal("")]).optional(),
+  websiteUrl: z.union([z.string().url(), z.literal("")]).optional(),
   activeRole: z.enum(["client", "freelancer"]).optional()
 });
 
@@ -32,7 +32,9 @@ export const jobCreateSchema = z.object({
   category: z.string().min(2).max(80),
   budgetAmount: z.string().regex(/^\d+(\.\d{1,9})?$/),
   budgetToken: z.string().min(2).max(20),
-  deadline: z.string().nullable().optional()
+  deadline: z.string().nullable().optional(),
+  deliverables: z.array(z.string().min(2).max(240)).max(12).optional(),
+  acceptanceCriteria: z.array(z.string().min(2).max(240)).max(12).optional()
 });
 
 export const applyJobSchema = z.object({

@@ -43,7 +43,10 @@ export function TopBar() {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between gap-3 rounded-[24px] border border-white/75 bg-white/70 px-3 py-2.5 shadow-[0_12px_36px_rgba(58,88,105,.095)] backdrop-blur-2xl">
       <Link className="flex min-w-0 items-center gap-2.5" href="/profile">
-        {avatarUrl ? <img alt={displayName} className="h-11 w-11 shrink-0 rounded-[16px] object-cover ring-2 ring-white" src={avatarUrl} /> : <WorkPayLogo size="sm" className="ring-2" />}
+        {avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img alt={displayName} className="h-11 w-11 shrink-0 rounded-[16px] object-cover ring-2 ring-white" src={avatarUrl} />
+        ) : <WorkPayLogo size="sm" className="ring-2" />}
         <div className="min-w-0">
           <p className="truncate text-sm font-black text-[#17272f]">{displayName}</p>
           <p className="truncate text-[10px] font-semibold text-[#71838c]">{username ? `@${username}` : t.home.subtitle}</p>

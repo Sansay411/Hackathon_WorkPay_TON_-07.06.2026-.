@@ -23,7 +23,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const language = normalizeLanguage(cookieStore.get("workpay:language")?.value);
 
   return (
-    <html lang={language} suppressHydrationWarning>
+    <html data-scroll-behavior="smooth" lang={language} suppressHydrationWarning>
       <body>
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
         <Providers initialLanguage={language}>{children}</Providers>

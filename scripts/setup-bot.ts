@@ -17,7 +17,7 @@ async function main() {
   await configureBotMenu(bot);
   await bot.api.setWebhook(webhookUrl, {
     secret_token: config.webhookSecret ?? undefined,
-    allowed_updates: ["message", "callback_query"]
+    allowed_updates: ["message", "callback_query", "pre_checkout_query"]
   });
 
   console.log(`Configured @${config.username}`);

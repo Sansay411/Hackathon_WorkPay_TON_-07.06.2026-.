@@ -15,6 +15,10 @@ export type WorkPayProfile = {
   bio: string | null;
   skills: string[];
   hourlyRate: string | null;
+  portfolioChannel: string | null;
+  githubUrl: string | null;
+  linkedinUrl: string | null;
+  websiteUrl: string | null;
   rating: number;
   completedDealsCount: number;
   successRate: number;
@@ -24,6 +28,8 @@ export type WorkPayProfile = {
   subscriptionUntil: string | null;
   subscriptionTier: string | null;
   connectsBalance: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ProfileLoadResult =
@@ -32,8 +38,8 @@ export type ProfileLoadResult =
   | { status: "setup_required"; message: string }
   | { status: "unauthorized"; message: string };
 
-const profileSelect =
-  "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, rating, completed_deals_count, success_rate, energy_balance, active_role, subscription_until, subscription_tier, connects_balance";
+export const profileSelect =
+  "id, telegram_id, telegram_username, wallet_address, first_name, last_name, avatar_url, language, role, bio, skills, hourly_rate, portfolio_channel, github_url, linkedin_url, website_url, rating, completed_deals_count, success_rate, energy_balance, ton_balance, active_role, subscription_until, subscription_tier, connects_balance, created_at, updated_at";
 
 export async function getVerifiedProfile(initData: string | undefined | null): Promise<ProfileLoadResult> {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -93,6 +99,10 @@ export function mapProfileRow(row: Record<string, unknown>): WorkPayProfile {
     bio: typeof row.bio === "string" ? row.bio : null,
     skills: Array.isArray(row.skills) ? row.skills.filter((item): item is string => typeof item === "string") : [],
     hourlyRate: row.hourly_rate == null ? null : String(row.hourly_rate),
+    portfolioChannel: typeof row.portfolio_channel === "string" ? row.portfolio_channel : null,
+    githubUrl: typeof row.github_url === "string" ? row.github_url : null,
+    linkedinUrl: typeof row.linkedin_url === "string" ? row.linkedin_url : null,
+    websiteUrl: typeof row.website_url === "string" ? row.website_url : null,
     rating: Number(row.rating ?? 0),
     completedDealsCount: Number(row.completed_deals_count ?? 0),
     successRate: Number(row.success_rate ?? 0),
@@ -101,7 +111,9 @@ export function mapProfileRow(row: Record<string, unknown>): WorkPayProfile {
     activeRole: row.active_role === "freelancer" ? "freelancer" : "client",
     subscriptionUntil: typeof row.subscription_until === "string" ? row.subscription_until : null,
     subscriptionTier: typeof row.subscription_tier === "string" ? row.subscription_tier : null,
-    connectsBalance: typeof row.connects_balance === "number" ? row.connects_balance : 30
+    connectsBalance: Number(row.connects_balance ?? 30),
+    createdAt: String(row.created_at ?? new Date().toISOString()),
+    updatedAt: String(row.updated_at ?? new Date().toISOString())
   };
 }
 

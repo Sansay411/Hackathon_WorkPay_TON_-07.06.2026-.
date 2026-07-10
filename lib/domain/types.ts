@@ -13,6 +13,10 @@ export type Profile = {
   bio?: string | null;
   skills?: string[];
   hourlyRate?: string | null;
+  portfolioChannel?: string | null;
+  githubUrl?: string | null;
+  linkedinUrl?: string | null;
+  websiteUrl?: string | null;
   rating?: number;
   completedDealsCount?: number;
   successRate?: number;
