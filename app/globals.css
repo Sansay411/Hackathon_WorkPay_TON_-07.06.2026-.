@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -47,9 +49,60 @@
 }
 
 body {
+  position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
   background: hsl(var(--background));
   color: hsl(var(--foreground));
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
+  font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(136, 218, 241, .26), transparent 24rem),
+    radial-gradient(circle at 94% 18%, rgba(196, 229, 242, .48), transparent 28rem),
+    linear-gradient(145deg, #fbfcfd 0%, #f2f7fa 48%, #edf4f8 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -34%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .62;
+  transform: rotate(-8deg);
+  background: repeating-linear-gradient(
+    128deg,
+    transparent 0 10%,
+    rgba(255, 255, 255, .68) 10.5% 18%,
+    rgba(210, 229, 238, .2) 18.5% 19%,
+    transparent 19.5% 31%
+  );
+  filter: blur(2px);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  right: -26rem;
+  bottom: -24rem;
+  z-index: -1;
+  width: 42rem;
+  height: 42rem;
+  pointer-events: none;
+  border: 5rem solid rgba(255, 255, 255, .42);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(173, 208, 222, .16);
+}
+
+.workpay-main {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+}
+
+.workpay-content {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
