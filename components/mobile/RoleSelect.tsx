@@ -18,14 +18,14 @@ export function RoleSelect() {
         const Icon = role.icon;
         return (
           <button
-            className={`flex items-center gap-3 rounded-[24px] p-4 text-left font-black shadow-sm transition ${
-              selected === role.label ? "bg-[#171c20] text-white" : "bg-white text-[#171c20]"
+            className={`flex items-center gap-3 rounded-[24px] border p-4 text-left font-black shadow-sm transition ${
+              selected === role.label ? "border-[#a3e635] bg-[#a3e635] text-black" : "border-[#262932] bg-[#16181f] text-white hover:border-[#a3e635]/40"
             }`}
             key={role.label}
             onClick={() => setSelected(role.label)}
             type="button"
           >
-            <span className={`rounded-2xl p-3 ${selected === role.label ? "bg-[#e6f7ff] text-[#171c20]" : "bg-[#e6f7ff]"}`}>
+            <span className={`rounded-2xl p-3 ${selected === role.label ? "bg-black text-[#a3e635]" : "bg-[#111318] text-[#a3e635]"}`}>
               <Icon className="h-5 w-5" />
             </span>
             {role.label}

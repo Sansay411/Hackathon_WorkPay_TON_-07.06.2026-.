@@ -5,47 +5,47 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 40% 98%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --primary: 199 89% 48%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 220 14% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 220 14% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 164 76% 42%;
-  --accent-foreground: 0 0% 100%;
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
+  --card: 240 8% 7%;
+  --card-foreground: 0 0% 98%;
+  --primary: 84 81% 52%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 240 6% 12%;
+  --secondary-foreground: 84 81% 52%;
+  --muted: 240 6% 14%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 84 81% 52%;
+  --accent-foreground: 0 0% 0%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 199 89% 48%;
-  --tg-bg-color: #f2f7fa;
-  --tg-secondary-bg-color: #ffffff;
-  --tg-text-color: #17272f;
-  --tg-hint-color: #71838c;
+  --border: 240 6% 16%;
+  --input: 240 6% 16%;
+  --ring: 84 81% 52%;
+  --tg-bg-color: #08090a;
+  --tg-secondary-bg-color: #111318;
+  --tg-text-color: #ffffff;
+  --tg-hint-color: #9ca3af;
 }
 
 .dark {
-  --background: 220 20% 8%;
-  --foreground: 210 40% 96%;
-  --card: 220 18% 12%;
-  --card-foreground: 210 40% 96%;
-  --primary: 199 89% 56%;
-  --primary-foreground: 222 47% 11%;
-  --secondary: 220 14% 16%;
-  --secondary-foreground: 210 40% 96%;
-  --muted: 220 14% 16%;
-  --muted-foreground: 215 20% 72%;
-  --accent: 164 76% 44%;
-  --accent-foreground: 222 47% 11%;
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
+  --card: 240 8% 7%;
+  --card-foreground: 0 0% 98%;
+  --primary: 84 81% 52%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 240 6% 12%;
+  --secondary-foreground: 84 81% 52%;
+  --muted: 240 6% 14%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 84 81% 52%;
+  --accent-foreground: 0 0% 0%;
   --destructive: 0 75% 56%;
   --destructive-foreground: 0 0% 100%;
-  --border: 220 13% 22%;
-  --input: 220 13% 22%;
-  --ring: 199 89% 56%;
+  --border: 240 6% 16%;
+  --input: 240 6% 16%;
+  --ring: 84 81% 52%;
 }
 
 * {
@@ -56,7 +56,7 @@ body {
   position: relative;
   isolation: isolate;
   overflow-x: hidden;
-  background: hsl(var(--background));
+  background: #08090a;
   color: hsl(var(--foreground));
   letter-spacing: -0.01em;
   font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
@@ -64,9 +64,9 @@ body {
   text-rendering: optimizeLegibility;
   overscroll-behavior-x: none;
   background:
-    radial-gradient(circle at 8% 4%, rgba(136, 218, 241, .26), transparent 24rem),
-    radial-gradient(circle at 94% 18%, rgba(196, 229, 242, .48), transparent 28rem),
-    linear-gradient(145deg, #fbfcfd 0%, #f2f7fa 48%, #edf4f8 100%);
+    radial-gradient(circle at 12% 8%, rgba(163, 230, 53, 0.12), transparent 28rem),
+    radial-gradient(circle at 88% 85%, rgba(132, 204, 22, 0.08), transparent 30rem),
+    linear-gradient(145deg, #07080a 0%, #0d0f14 50%, #0a0b0e 100%);
 }
 
 body::before {
@@ -75,16 +75,16 @@ body::before {
   inset: -34%;
   z-index: -1;
   pointer-events: none;
-  opacity: .62;
+  opacity: .18;
   transform: rotate(-8deg);
   background: repeating-linear-gradient(
     128deg,
     transparent 0 10%,
-    rgba(255, 255, 255, .68) 10.5% 18%,
-    rgba(210, 229, 238, .2) 18.5% 19%,
+    rgba(163, 230, 53, .12) 10.5% 18%,
+    rgba(255, 255, 255, .03) 18.5% 19%,
     transparent 19.5% 31%
   );
-  filter: blur(2px);
+  filter: blur(3px);
 }
 
 body::after {
@@ -96,9 +96,9 @@ body::after {
   width: 42rem;
   height: 42rem;
   pointer-events: none;
-  border: 5rem solid rgba(255, 255, 255, .42);
+  border: 5rem solid rgba(163, 230, 53, .05);
   border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(173, 208, 222, .16);
+  box-shadow: 0 0 0 1px rgba(163, 230, 53, .08);
 }
 
 .workpay-main {
@@ -124,6 +124,6 @@ body::after {
 }
 
 ::selection {
-  background: #e6f7ff;
-  color: #10150f;
+  background: #a3e635;
+  color: #000000;
 }

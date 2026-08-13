@@ -31,23 +31,23 @@ export default function MarketplacePage() {
 
   return (
     <MobileShell>
-      <div className="space-y-5">
+      <div className="space-y-5 text-white">
         <header>
-          <p className="text-sm font-black text-[#229ED9]">{t.marketplace.eyebrow}</p>
-          <h1 className="mt-1 text-[34px] font-black leading-none tracking-normal">{t.marketplace.title}</h1>
-          <p className="mt-2 text-sm font-medium leading-6 text-[#64748b]">{t.marketplace.description}</p>
+          <p className="text-sm font-black text-[#a3e635]">{t.marketplace.eyebrow}</p>
+          <h1 className="mt-1 text-[34px] font-black leading-none tracking-normal text-white">{t.marketplace.title}</h1>
+          <p className="mt-2 text-sm font-medium leading-6 text-[#9ca3af]">{t.marketplace.description}</p>
         </header>
         <ConnectsWidget
           connects={profile?.connectsBalance ?? demoProfile.connectsBalance ?? 30}
           subscriptionUntil={profile?.subscriptionUntil ?? demoProfile.subscriptionUntil ?? null}
         />
-        <label className="flex h-14 items-center gap-3 rounded-[24px] border border-[#dfe3e8] bg-white px-4 shadow-[0_12px_30px_rgba(0,101,142,0.08)]">
-          <Search className="h-5 w-5 text-[#64748b]" />
-          <input className="w-full bg-transparent text-sm font-semibold outline-none placeholder:text-[#64748b]" placeholder={t.marketplace.search} />
+        <label className="flex h-14 items-center gap-3 rounded-[24px] border border-[#262932] bg-[#111318] px-4 shadow-[0_12px_30px_rgba(0,0,0,0.6)]">
+          <Search className="h-5 w-5 text-[#a3e635]" />
+          <input className="w-full bg-transparent text-sm font-semibold text-white outline-none placeholder:text-[#6b7280]" placeholder={t.marketplace.search} />
         </label>
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {t.marketplace.categories.map((category, index) => (
-            <button className={`shrink-0 rounded-full px-4 py-2 text-sm font-black ${index === 0 ? "bg-[#00658e] text-white" : "bg-white text-[#64748b]"}`} key={category} type="button">
+            <button className={`shrink-0 rounded-full px-4 py-2 text-sm font-black transition ${index === 0 ? "bg-[#a3e635] text-black shadow-[0_4px_16px_rgba(163,230,53,0.3)]" : "border border-[#262932] bg-[#111318] text-[#9ca3af] hover:text-white"}`} key={category} type="button">
               {category}
             </button>
           ))}

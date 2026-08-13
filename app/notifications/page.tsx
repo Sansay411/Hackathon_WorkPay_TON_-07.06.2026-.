@@ -9,10 +9,10 @@ export default function NotificationsPage() {
 
   return (
     <MobileShell>
-      <div className="space-y-5">
+      <div className="space-y-5 text-white">
         <header>
-          <p className="text-sm font-black text-[#229ED9]">{t.notifications.eyebrow}</p>
-          <h1 className="mt-1 text-[34px] font-black leading-none tracking-normal">{t.notifications.title}</h1>
+          <p className="text-sm font-black text-[#a3e635]">{t.notifications.eyebrow}</p>
+          <h1 className="mt-1 text-[34px] font-black leading-none tracking-normal text-white">{t.notifications.title}</h1>
         </header>
         <EmptyState
           title={t.notifications.emptyTitle}

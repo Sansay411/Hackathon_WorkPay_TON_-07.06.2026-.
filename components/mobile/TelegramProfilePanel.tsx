@@ -248,6 +248,7 @@ export function TelegramProfilePanel() {
       const payload = await response.json();
       if (!response.ok || !payload.ok) throw new Error(payload.error?.message || "AI assistant failed.");
       const result = payload.data.result as AiProfileResult;
+
       setDraft((current) => ({
         ...current,
         bio: result.bio || current.bio,
@@ -267,10 +268,10 @@ export function TelegramProfilePanel() {
 
   if (loading) {
     return (
-      <div className="grid min-h-[420px] place-items-center rounded-[32px] border border-white/70 bg-white/70 backdrop-blur-2xl">
+      <div className="grid min-h-[420px] place-items-center rounded-[32px] border border-[#262932] bg-[#111318] text-white">
         <div className="text-center">
-          <LoaderCircle className="mx-auto h-7 w-7 animate-spin text-cyan-600" />
-          <p className="mt-3 text-sm font-bold text-slate-500">{ru ? "Собираю профиль..." : "Loading profile..."}</p>
+          <LoaderCircle className="mx-auto h-7 w-7 animate-spin text-[#a3e635]" />
+          <p className="mt-3 text-sm font-bold text-[#9ca3af]">{ru ? "Собираю профиль..." : "Loading profile..."}</p>
         </div>
       </div>
     );
@@ -281,42 +282,42 @@ export function TelegramProfilePanel() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-      className="space-y-4"
+      className="space-y-4 text-white"
     >
-      <section className="overflow-hidden rounded-[32px] border border-white/75 bg-white/[0.74] shadow-[0_24px_70px_rgba(41,91,116,0.15)] backdrop-blur-2xl">
-        <div className="bg-[radial-gradient(circle_at_top_right,rgba(45,212,191,0.26),transparent_42%),radial-gradient(circle_at_left,rgba(56,189,248,0.25),transparent_46%),linear-gradient(145deg,rgba(255,255,255,0.95),rgba(238,250,252,0.74))] p-5">
+      <section className="overflow-hidden rounded-[32px] border border-[#262932] bg-[#111318] shadow-[0_24px_70px_rgba(0,0,0,0.8)]">
+        <div className="bg-[radial-gradient(circle_at_top_right,rgba(163,230,53,0.15),transparent_42%),radial-gradient(circle_at_left,rgba(132,204,22,0.1),transparent_46%)] p-5">
           <div className="flex items-center gap-4">
             <div className="relative">
               {view?.avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={view.avatarUrl} alt="" className="h-[72px] w-[72px] rounded-[24px] border-2 border-white object-cover shadow-lg" />
+                <img src={view.avatarUrl} alt="" className="h-[72px] w-[72px] rounded-[24px] border-2 border-[#a3e635] object-cover shadow-lg" />
               ) : (
-                <div className="grid h-[72px] w-[72px] place-items-center rounded-[24px] border-2 border-white bg-gradient-to-br from-cyan-500 to-emerald-400 text-xl font-black text-white shadow-lg">
+                <div className="grid h-[72px] w-[72px] place-items-center rounded-[24px] border-2 border-[#a3e635] bg-[#08090a] text-xl font-black text-[#a3e635] shadow-lg">
                   {initials || <UserRound className="h-7 w-7" />}
                 </div>
               )}
-              <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full border-2 border-white bg-emerald-500 text-white">
+              <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#111318] bg-[#a3e635] text-black">
                 <BadgeCheck className="h-3.5 w-3.5" />
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xl font-black tracking-[-0.03em] text-slate-950">{name}</p>
+              <p className="truncate text-xl font-black tracking-[-0.03em] text-white">{name}</p>
               <div className="mt-1 flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-cyan-200 bg-white/70 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-cyan-800">
+                <span className="rounded-full border border-[#a3e635]/40 bg-[#a3e635]/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-[#a3e635]">
                   {view?.activeRole === "client" ? (ru ? "Заказчик" : "Client") : (ru ? "Фрилансер" : "Freelancer")}
                 </span>
-                {view?.telegramUsername ? <span className="text-xs font-bold text-slate-500">@{view.telegramUsername}</span> : null}
+                {view?.telegramUsername ? <span className="text-xs font-bold text-[#9ca3af]">@{view.telegramUsername}</span> : null}
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-black tracking-[-0.04em] text-slate-950">{completion}%</p>
-              <p className="text-[10px] font-black uppercase tracking-[0.1em] text-slate-400">{ru ? "готово" : "ready"}</p>
+              <p className="text-2xl font-black tracking-[-0.04em] text-[#a3e635]">{completion}%</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#9ca3af]">{ru ? "готово" : "ready"}</p>
             </div>
           </div>
 
-          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/80">
+          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#262932]">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-400"
+              className="h-full rounded-full bg-[#a3e635]"
               animate={{ width: `${completion}%` }}
               transition={{ type: "spring", stiffness: 120, damping: 22 }}
             />
@@ -330,33 +331,33 @@ export function TelegramProfilePanel() {
         </div>
       </section>
 
-      <section className="rounded-[28px] border border-white/70 bg-white/[0.74] p-4 shadow-[0_18px_50px_rgba(41,91,116,0.1)] backdrop-blur-xl">
-        <div className="flex items-center gap-2 text-sm font-black text-slate-950">
-          <Bot className="h-4 w-4 text-cyan-600" />
+      <section className="rounded-[28px] border border-[#262932] bg-[#111318] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
+        <div className="flex items-center gap-2 text-sm font-black text-white">
+          <Bot className="h-4 w-4 text-[#a3e635]" />
           {ru ? "AI-редактор профиля" : "AI profile editor"}
         </div>
-        <p className="mt-1 text-xs font-medium leading-5 text-slate-500">
+        <p className="mt-1 text-xs font-medium leading-5 text-[#9ca3af]">
           {ru ? "Опишите специализацию и желаемых клиентов. AI не будет придумывать опыт." : "Describe your specialty and ideal clients. AI will not invent experience."}
         </p>
         <textarea
           value={aiBrief}
           onChange={(event) => setAiBrief(event.target.value)}
           rows={3}
-          className="mt-3 w-full resize-none rounded-2xl border border-slate-200/80 bg-white/85 px-4 py-3 text-sm font-semibold outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100"
+          className="mt-3 w-full resize-none rounded-2xl border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-semibold text-white outline-none transition placeholder:text-[#6b7280] focus:border-[#a3e635]"
           placeholder={ru ? "Я frontend-разработчик, специализируюсь на Telegram Mini Apps..." : "I am a frontend developer focused on Telegram Mini Apps..."}
         />
         <button
           type="button"
           onClick={improveProfile}
           disabled={aiLoading}
-          className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 text-sm font-black text-white shadow-lg transition active:scale-[0.985] disabled:opacity-60"
+          className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-[#a3e635] px-4 text-sm font-black text-black shadow-lg transition hover:bg-[#84cc16] active:scale-[0.985] disabled:opacity-60"
         >
-          {aiLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+          {aiLoading ? <LoaderCircle className="h-4 w-4 animate-spin text-black" /> : <Sparkles className="h-4 w-4 text-black" />}
           {aiLoading ? (ru ? "Редактирую..." : "Improving...") : ru ? "Улучшить с DeepSeek" : "Improve with DeepSeek"}
         </button>
       </section>
 
-      <section className="space-y-4 rounded-[28px] border border-white/70 bg-white/[0.78] p-4 shadow-[0_18px_50px_rgba(41,91,116,0.1)] backdrop-blur-xl">
+      <section className="space-y-4 rounded-[28px] border border-[#262932] bg-[#111318] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
         <Field label={ru ? "О себе" : "Professional bio"} hint={`${draft.bio.length}/2000`}>
           <textarea value={draft.bio} onChange={(event) => update("bio", event.target.value)} maxLength={2000} rows={7} className={`${inputClass} resize-none`} placeholder={ru ? "Чем вы сильны, какие задачи решаете и как работаете..." : "Your strengths, the problems you solve, and how you work..."} />
         </Field>
@@ -369,8 +370,8 @@ export function TelegramProfilePanel() {
           <input value={draft.hourlyRate} onChange={(event) => update("hourlyRate", event.target.value)} inputMode="decimal" className={inputClass} placeholder="5" />
         </Field>
 
-        <div className="border-t border-slate-200/70 pt-4">
-          <p className="text-xs font-black uppercase tracking-[0.1em] text-slate-500">{ru ? "Доверие и портфолио" : "Trust and portfolio"}</p>
+        <div className="border-t border-[#262932] pt-4">
+          <p className="text-xs font-black uppercase tracking-[0.1em] text-[#9ca3af]">{ru ? "Доверие и портфолио" : "Trust and portfolio"}</p>
           <div className="mt-3 space-y-3">
             <LinkField icon={<Send className="h-4 w-4" />} label="Telegram portfolio" value={draft.portfolioChannel} onChange={(value) => update("portfolioChannel", value)} placeholder="https://t.me/your_portfolio" />
             <LinkField icon={<BriefcaseBusiness className="h-4 w-4" />} label="GitHub" value={draft.githubUrl} onChange={(value) => update("githubUrl", value)} placeholder="https://github.com/username" />
@@ -381,15 +382,15 @@ export function TelegramProfilePanel() {
       </section>
 
       {suggestions.length ? (
-        <section className="rounded-[24px] border border-emerald-200 bg-emerald-50/80 p-4">
-          <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-emerald-800">
-            <CheckCircle2 className="h-4 w-4" />
+        <section className="rounded-[24px] border border-[#a3e635]/40 bg-[#a3e635]/10 p-4">
+          <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-[#a3e635]">
+            <CheckCircle2 className="h-4 w-4 text-[#a3e635]" />
             {ru ? "Что усилить" : "Ways to improve"}
           </p>
           <ul className="mt-3 space-y-2">
             {suggestions.slice(0, 5).map((item) => (
-              <li key={item} className="flex gap-2 text-xs font-semibold leading-5 text-emerald-900/75">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+              <li key={item} className="flex gap-2 text-xs font-semibold leading-5 text-white">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#a3e635]" />
                 {item}
               </li>
             ))}
@@ -398,7 +399,7 @@ export function TelegramProfilePanel() {
       ) : null}
 
       {message ? (
-        <div className={`rounded-2xl border px-4 py-3 text-sm font-bold ${message.type === "error" ? "border-rose-200 bg-rose-50 text-rose-700" : message.type === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-cyan-200 bg-cyan-50 text-cyan-800"}`}>
+        <div className={`rounded-2xl border px-4 py-3 text-sm font-bold ${message.type === "error" ? "border-rose-500/40 bg-rose-500/15 text-rose-400" : message.type === "success" ? "border-[#a3e635]/40 bg-[#a3e635]/15 text-[#a3e635]" : "border-[#a3e635]/40 bg-[#a3e635]/10 text-[#a3e635]"}`}>
           {message.text}
         </div>
       ) : null}
@@ -407,9 +408,9 @@ export function TelegramProfilePanel() {
         type="button"
         onClick={saveProfile}
         disabled={saving}
-        className="flex min-h-14 w-full items-center justify-center gap-2 rounded-[20px] bg-gradient-to-r from-cyan-500 to-sky-600 px-5 text-sm font-black text-white shadow-[0_16px_34px_rgba(14,165,233,0.28)] transition active:scale-[0.985] disabled:opacity-60"
+        className="flex min-h-14 w-full items-center justify-center gap-2 rounded-[20px] bg-[#a3e635] px-5 text-sm font-black text-black shadow-[0_16px_34px_rgba(163,230,53,0.25)] transition hover:bg-[#84cc16] active:scale-[0.985] disabled:opacity-60"
       >
-        {saving ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+        {saving ? <LoaderCircle className="h-5 w-5 animate-spin text-black" /> : <Save className="h-5 w-5 text-black" />}
         {saving ? (ru ? "Сохраняю..." : "Saving...") : ru ? "Сохранить профиль" : "Save profile"}
       </button>
     </motion.div>
@@ -419,7 +420,7 @@ export function TelegramProfilePanel() {
 export default TelegramProfilePanel;
 
 const inputClass =
-  "min-h-12 w-full rounded-2xl border border-slate-200/80 bg-white/85 px-4 py-3 text-sm font-semibold text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100";
+  "min-h-12 w-full rounded-2xl border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-semibold text-white outline-none transition placeholder:text-[#6b7280] focus:border-[#a3e635]";
 
 function Field({
   label,
@@ -432,9 +433,9 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.08em] text-slate-500">
+      <span className="mb-2 flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.08em] text-[#9ca3af]">
         {label}
-        {hint ? <span className="font-bold normal-case tracking-normal text-slate-400">{hint}</span> : null}
+        {hint ? <span className="font-bold normal-case tracking-normal text-[#6b7280]">{hint}</span> : null}
       </span>
       {children}
     </label>
@@ -456,8 +457,8 @@ function LinkField({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 flex items-center gap-2 text-xs font-bold text-slate-600">
-        <span className="text-cyan-600">{icon}</span>
+      <span className="mb-1.5 flex items-center gap-2 text-xs font-bold text-[#9ca3af]">
+        <span className="text-[#a3e635]">{icon}</span>
         {label}
       </span>
       <input type="url" value={value} onChange={(event) => onChange(event.target.value)} className={inputClass} placeholder={placeholder} />
@@ -467,12 +468,12 @@ function LinkField({
 
 function Stat({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <div className="rounded-2xl border border-white/80 bg-white/60 px-3 py-2.5">
-      <div className="flex items-center gap-1.5 text-cyan-700">
+    <div className="rounded-2xl border border-[#262932] bg-[#16181f] px-3 py-2.5">
+      <div className="flex items-center gap-1.5 text-[#a3e635]">
         {icon}
-        <span className="text-sm font-black text-slate-950">{value}</span>
+        <span className="text-sm font-black text-white">{value}</span>
       </div>
-      <p className="mt-1 truncate text-[9px] font-black uppercase tracking-[0.08em] text-slate-400">{label}</p>
+      <p className="mt-1 truncate text-[9px] font-black uppercase tracking-[0.08em] text-[#9ca3af]">{label}</p>
     </div>
   );
 }

@@ -164,44 +164,44 @@ export function JobForm() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-      className="space-y-4"
+      className="space-y-4 text-white"
     >
-      <section className="overflow-hidden rounded-[32px] border border-white/70 bg-white/75 shadow-[0_24px_70px_rgba(41,91,116,0.14)] backdrop-blur-2xl">
-        <div className="bg-[radial-gradient(circle_at_top_right,rgba(65,190,230,0.28),transparent_46%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(238,249,253,0.76))] p-5">
+      <section className="overflow-hidden rounded-[32px] border border-[#262932] bg-[#111318] shadow-[0_24px_70px_rgba(0,0,0,0.8)] text-white">
+        <div className="bg-[radial-gradient(circle_at_top_right,rgba(163,230,53,0.15),transparent_46%)] p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200/80 bg-white/70 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-800">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#a3e635]/40 bg-[#a3e635]/15 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-[#a3e635]">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 {ru ? "Умный бриф" : "Smart brief"}
               </span>
-              <h1 className="mt-3 text-[30px] font-black leading-[0.98] tracking-[-0.045em] text-slate-950">
+              <h1 className="mt-3 text-[30px] font-black leading-[0.98] tracking-[-0.045em] text-white">
                 {ru ? "Опишите результат, а не догадки" : "Describe the outcome, not the guesswork"}
               </h1>
-              <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-600">
+              <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-[#9ca3af]">
                 {ru
                   ? "Чёткие результаты и критерии приёмки снижают споры и помогают получить точные отклики."
                   : "Clear deliverables and acceptance criteria reduce disputes and attract precise proposals."}
               </p>
             </div>
-            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-white bg-cyan-500 text-white shadow-lg shadow-cyan-500/25">
-              <ListChecks className="h-6 w-6" />
+            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-[#a3e635]/30 bg-[#a3e635] text-black shadow-lg">
+              <ListChecks className="h-6 w-6 text-black" />
             </div>
           </div>
-          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-slate-200/70">
+          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#262932]">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400"
+              className="h-full rounded-full bg-[#a3e635]"
               animate={{ width: `${readyScore * 20}%` }}
             />
           </div>
-          <p className="mt-2 text-[11px] font-bold text-slate-500">
+          <p className="mt-2 text-[11px] font-bold text-[#9ca3af]">
             {ru ? `Готовность брифа: ${readyScore}/5` : `Brief readiness: ${readyScore}/5`}
           </p>
         </div>
       </section>
 
-      <section className="rounded-[28px] border border-white/70 bg-white/[0.72] p-4 shadow-[0_18px_50px_rgba(41,91,116,0.1)] backdrop-blur-xl">
-        <div className="flex items-center gap-2 text-sm font-black text-slate-900">
-          <Sparkles className="h-4 w-4 text-cyan-600" />
+      <section className="rounded-[28px] border border-[#262932] bg-[#111318] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
+        <div className="flex items-center gap-2 text-sm font-black text-white">
+          <Sparkles className="h-4 w-4 text-[#a3e635]" />
           {ru ? "Собрать бриф с DeepSeek" : "Build the brief with DeepSeek"}
         </div>
         <textarea
@@ -213,20 +213,20 @@ export function JobForm() {
               ? "Например: нужен Telegram Mini App для школы, кабинет ученика, подписка, срок 3 недели..."
               : "Example: Telegram Mini App for a school, student dashboard, subscription, three-week deadline..."
           }
-          className="mt-3 w-full resize-none rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100"
+          className="mt-3 w-full resize-none rounded-2xl border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-medium text-white outline-none transition placeholder:text-[#6b7280] focus:border-[#a3e635]"
         />
         <button
           type="button"
           onClick={improveWithAi}
           disabled={aiLoading}
-          className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 text-sm font-black text-white shadow-lg shadow-slate-900/15 transition active:scale-[0.985] disabled:opacity-60"
+          className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-[#a3e635] px-4 text-sm font-black text-black shadow-lg transition hover:bg-[#84cc16] active:scale-[0.985] disabled:opacity-60"
         >
-          {aiLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+          {aiLoading ? <LoaderCircle className="h-4 w-4 animate-spin text-black" /> : <Bot className="h-4 w-4 text-black" />}
           {aiLoading ? (ru ? "Собираю структуру..." : "Structuring...") : ru ? "Улучшить бриф" : "Improve brief"}
         </button>
       </section>
 
-      <section className="space-y-4 rounded-[28px] border border-white/70 bg-white/[0.76] p-4 shadow-[0_18px_50px_rgba(41,91,116,0.1)] backdrop-blur-xl">
+      <section className="space-y-4 rounded-[28px] border border-[#262932] bg-[#111318] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
         <Field label={ru ? "Название проекта" : "Project title"}>
           <input value={title} onChange={(event) => setTitle(event.target.value)} required minLength={5} maxLength={160} className={inputClass} placeholder={ru ? "Коротко и конкретно" : "Short and specific"} />
         </Field>
@@ -234,14 +234,14 @@ export function JobForm() {
         <div className="grid grid-cols-2 gap-3">
           <Field label={ru ? "Категория" : "Category"}>
             <select value={category} onChange={(event) => setCategory(event.target.value)} className={inputClass}>
-              {categories.map((item) => <option key={item}>{item}</option>)}
+              {categories.map((item) => <option className="bg-[#111318] text-white" key={item}>{item}</option>)}
             </select>
           </Field>
           <Field label={ru ? "Бюджет" : "Budget"}>
             <div className="relative">
-              <CircleDollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-600" />
+              <CircleDollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a3e635]" />
               <input value={budgetAmount} onChange={(event) => setBudgetAmount(event.target.value)} required inputMode="decimal" pattern="\d+(\.\d{1,9})?" className={`${inputClass} pl-9 pr-12`} placeholder="10" />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">TON</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-[#9ca3af]">TON</span>
             </div>
           </Field>
         </div>
@@ -260,7 +260,7 @@ export function JobForm() {
 
         <Field label={ru ? "Дедлайн" : "Deadline"}>
           <div className="relative">
-            <CalendarDays className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-600" />
+            <CalendarDays className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a3e635]" />
             <input type="datetime-local" value={deadline} onChange={(event) => setDeadline(event.target.value)} className={`${inputClass} pl-9`} />
           </div>
         </Field>
@@ -274,7 +274,7 @@ export function JobForm() {
       ) : null}
 
       {message ? (
-        <div className={`rounded-2xl border px-4 py-3 text-sm font-bold ${message.type === "error" ? "border-rose-200 bg-rose-50/90 text-rose-700" : "border-cyan-200 bg-cyan-50/90 text-cyan-800"}`}>
+        <div className={`rounded-2xl border px-4 py-3 text-sm font-bold ${message.type === "error" ? "border-rose-500/40 bg-rose-500/15 text-rose-400" : "border-[#a3e635]/40 bg-[#a3e635]/15 text-[#a3e635]"}`}>
           {message.text}
         </div>
       ) : null}
@@ -282,23 +282,23 @@ export function JobForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="group flex min-h-14 w-full items-center justify-center gap-2 rounded-[20px] bg-gradient-to-r from-cyan-500 to-sky-600 px-5 text-sm font-black text-white shadow-[0_16px_34px_rgba(14,165,233,0.28)] transition active:scale-[0.985] disabled:opacity-60"
+        className="group flex min-h-14 w-full items-center justify-center gap-2 rounded-[20px] bg-[#a3e635] px-5 text-sm font-black text-black shadow-[0_16px_34px_rgba(163,230,53,0.25)] transition hover:bg-[#84cc16] active:scale-[0.985] disabled:opacity-60"
       >
-        {submitting ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <CheckCircle2 className="h-5 w-5" />}
+        {submitting ? <LoaderCircle className="h-5 w-5 animate-spin text-black" /> : <CheckCircle2 className="h-5 w-5 text-black" />}
         {submitting ? (ru ? "Публикую..." : "Publishing...") : ru ? "Опубликовать вакансию" : "Publish job"}
-        {!submitting ? <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /> : null}
+        {!submitting ? <ArrowRight className="h-4 w-4 text-black transition-transform group-hover:translate-x-1" /> : null}
       </button>
     </motion.form>
   );
 }
 
 const inputClass =
-  "min-h-12 w-full rounded-2xl border border-slate-200/80 bg-white/85 px-4 py-3 text-sm font-semibold text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100";
+  "min-h-12 w-full rounded-2xl border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-semibold text-white outline-none transition placeholder:text-[#6b7280] focus:border-[#a3e635]";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-black uppercase tracking-[0.08em] text-slate-500">{label}</span>
+      <span className="mb-2 block text-xs font-black uppercase tracking-[0.08em] text-[#9ca3af]">{label}</span>
       {children}
     </label>
   );
@@ -306,12 +306,12 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function InsightCard({ title, items, tone }: { title: string; items: string[]; tone: "cyan" | "amber" }) {
   return (
-    <div className={`rounded-[24px] border p-4 ${tone === "cyan" ? "border-cyan-200 bg-cyan-50/80" : "border-amber-200 bg-amber-50/80"}`}>
-      <p className="text-xs font-black uppercase tracking-[0.1em] text-slate-700">{title}</p>
+    <div className="rounded-[24px] border border-[#262932] bg-[#16181f] p-4 text-white">
+      <p className="text-xs font-black uppercase tracking-[0.1em] text-[#a3e635]">{title}</p>
       <ul className="mt-2 space-y-2">
         {items.slice(0, 4).map((item) => (
-          <li key={item} className="flex gap-2 text-xs font-semibold leading-5 text-slate-600">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
+          <li key={item} className="flex gap-2 text-xs font-semibold leading-5 text-[#9ca3af]">
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#a3e635]" />
             {item}
           </li>
         ))}

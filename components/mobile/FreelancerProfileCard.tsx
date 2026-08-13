@@ -29,64 +29,64 @@ export function FreelancerProfileCard({ profile }: { profile: Profile }) {
 
   return (
     <div className="space-y-4">
-      <section className="overflow-hidden rounded-[32px] border border-white/75 bg-white/[0.75] shadow-[0_24px_70px_rgba(41,91,116,0.15)] backdrop-blur-2xl">
-        <div className="bg-[radial-gradient(circle_at_top_right,rgba(45,212,191,0.25),transparent_42%),radial-gradient(circle_at_left,rgba(56,189,248,0.25),transparent_46%),linear-gradient(145deg,rgba(255,255,255,0.96),rgba(238,250,252,0.74))] p-5">
+      <section className="overflow-hidden rounded-[32px] border border-[#262932] bg-[#111318] shadow-[0_24px_70px_rgba(0,0,0,0.8)] text-white">
+        <div className="bg-[radial-gradient(circle_at_top_right,rgba(163,230,53,0.15),transparent_42%),radial-gradient(circle_at_left,rgba(132,204,22,0.1),transparent_46%)] p-5">
           <div className="flex items-center gap-4">
             <div className="relative">
               {profile.avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={profile.avatarUrl} alt="" className="h-[76px] w-[76px] rounded-[24px] border-2 border-white object-cover shadow-lg" />
+                <img src={profile.avatarUrl} alt="" className="h-[76px] w-[76px] rounded-[24px] border-2 border-[#a3e635] object-cover shadow-lg" />
               ) : (
-                <div className="grid h-[76px] w-[76px] place-items-center rounded-[24px] border-2 border-white bg-gradient-to-br from-cyan-500 to-emerald-400 text-xl font-black text-white shadow-lg">
+                <div className="grid h-[76px] w-[76px] place-items-center rounded-[24px] border-2 border-[#a3e635] bg-[#08090a] text-xl font-black text-[#a3e635] shadow-lg">
                   {initials || <UserRound className="h-7 w-7" />}
                 </div>
               )}
-              <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full border-2 border-white bg-emerald-500 text-white">
+              <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full border-2 border-[#111318] bg-[#a3e635] text-black">
                 <BadgeCheck className="h-3.5 w-3.5" />
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="truncate text-2xl font-black tracking-[-0.04em] text-slate-950">{name}</h1>
-              <p className="mt-1 text-xs font-bold text-slate-500">
+              <h1 className="truncate text-2xl font-black tracking-[-0.04em] text-white">{name}</h1>
+              <p className="mt-1 text-xs font-bold text-[#9ca3af]">
                 {profile.telegramUsername ? `@${profile.telegramUsername}` : "Verified Telegram professional"}
               </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                <span className="inline-flex items-center gap-1 rounded-full border border-cyan-200 bg-white/70 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-cyan-800">
+                <span className="inline-flex items-center gap-1 rounded-full border border-[#a3e635]/40 bg-[#a3e635]/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-[#a3e635]">
                   <BriefcaseBusiness className="h-3 w-3" />
                   Freelancer
                 </span>
                 {profile.hourlyRate ? (
-                  <span className="rounded-full bg-slate-950 px-2.5 py-1 text-[10px] font-black text-white">{profile.hourlyRate} TON/h</span>
+                  <span className="rounded-full bg-[#a3e635] px-2.5 py-1 text-[10px] font-black text-black">{profile.hourlyRate} TON/h</span>
                 ) : null}
               </div>
             </div>
           </div>
 
           <div className="mt-5 grid grid-cols-3 gap-2">
-            <Stat icon={<Star className="h-3.5 w-3.5 fill-current" />} value={(profile.rating ?? 0).toFixed(1)} label="Rating" />
-            <Stat icon={<BriefcaseBusiness className="h-3.5 w-3.5" />} value={String(profile.completedDealsCount ?? 0)} label="Deals" />
-            <Stat icon={<Sparkles className="h-3.5 w-3.5" />} value={`${profile.successRate ?? 0}%`} label="Success" />
+            <Stat icon={<Star className="h-3.5 w-3.5 fill-current text-[#a3e635]" />} value={(profile.rating ?? 0).toFixed(1)} label="Rating" />
+            <Stat icon={<BriefcaseBusiness className="h-3.5 w-3.5 text-[#a3e635]" />} value={String(profile.completedDealsCount ?? 0)} label="Deals" />
+            <Stat icon={<Sparkles className="h-3.5 w-3.5 text-[#a3e635]" />} value={`${profile.successRate ?? 0}%`} label="Success" />
           </div>
         </div>
       </section>
 
-      <section className="rounded-[28px] border border-white/75 bg-white/[0.78] p-5 shadow-[0_18px_50px_rgba(41,91,116,0.09)] backdrop-blur-xl">
-        <h2 className="text-xs font-black uppercase tracking-[0.11em] text-slate-500">About</h2>
-        <p className="mt-3 whitespace-pre-wrap text-sm font-medium leading-7 text-slate-700">
+      <section className="rounded-[28px] border border-[#262932] bg-[#111318] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
+        <h2 className="text-xs font-black uppercase tracking-[0.11em] text-[#a3e635]">About</h2>
+        <p className="mt-3 whitespace-pre-wrap text-sm font-medium leading-7 text-[#9ca3af]">
           {profile.bio || "This professional has not added a bio yet."}
         </p>
       </section>
 
-      <section className="rounded-[28px] border border-white/75 bg-white/[0.74] p-5 backdrop-blur-xl">
-        <h2 className="text-xs font-black uppercase tracking-[0.11em] text-slate-500">Expertise</h2>
+      <section className="rounded-[28px] border border-[#262932] bg-[#111318] p-5">
+        <h2 className="text-xs font-black uppercase tracking-[0.11em] text-[#a3e635]">Expertise</h2>
         {skills.length ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {skills.map((skill) => (
-              <span key={skill} className="rounded-full border border-cyan-200/80 bg-cyan-50/80 px-3 py-1.5 text-xs font-black text-cyan-800">{skill}</span>
+              <span key={skill} className="rounded-full border border-[#a3e635]/40 bg-[#a3e635]/15 px-3 py-1.5 text-xs font-black text-[#a3e635]">{skill}</span>
             ))}
           </div>
         ) : (
-          <p className="mt-3 text-sm font-medium text-slate-400">Skills are not listed yet.</p>
+          <p className="mt-3 text-sm font-medium text-[#6b7280]">Skills are not listed yet.</p>
         )}
       </section>
 
@@ -98,9 +98,9 @@ export function FreelancerProfileCard({ profile }: { profile: Profile }) {
               href={link.href}
               target="_blank"
               rel="noreferrer"
-              className="flex min-h-12 items-center justify-center gap-2 rounded-[18px] border border-white/80 bg-white/[0.72] px-3 text-xs font-black text-slate-700 backdrop-blur-xl transition active:scale-[0.98]"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[18px] border border-[#262932] bg-[#16181f] px-3 text-xs font-black text-white transition hover:border-[#a3e635]/40 active:scale-[0.98]"
             >
-              <span className="text-cyan-600">{link.icon}</span>
+              <span className="text-[#a3e635]">{link.icon}</span>
               {link.label}
             </a>
           ))}
@@ -112,11 +112,11 @@ export function FreelancerProfileCard({ profile }: { profile: Profile }) {
 
 function Stat({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <div className="rounded-[18px] border border-white/85 bg-white/60 p-2.5 text-center">
-      <p className="flex items-center justify-center gap-1 text-sm font-black text-slate-950">
-        <span className="text-amber-500">{icon}</span>{value}
+    <div className="rounded-[18px] border border-[#262932] bg-[#16181f] p-2.5 text-center">
+      <p className="flex items-center justify-center gap-1 text-sm font-black text-white">
+        <span>{icon}</span>{value}
       </p>
-      <p className="mt-1 text-[9px] font-black uppercase tracking-[0.08em] text-slate-400">{label}</p>
+      <p className="mt-1 text-[9px] font-black uppercase tracking-[0.08em] text-[#9ca3af]">{label}</p>
     </div>
   );
 }

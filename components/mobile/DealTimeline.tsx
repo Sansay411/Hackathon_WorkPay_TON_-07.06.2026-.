@@ -32,23 +32,23 @@ export function DealTimeline({ status }: DealTimelineProps) {
   ];
 
   return (
-    <section className="rounded-[30px] border border-white/70 bg-[#ffffff] p-5 shadow-[0_14px_34px_rgba(17,24,15,0.09)]">
-      <h2 className="text-2xl font-black">Transaction Timeline</h2>
+    <section className="rounded-[30px] border border-[#262932] bg-[#111318] p-5 shadow-[0_14px_34px_rgba(0,0,0,0.6)] text-white">
+      <h2 className="text-2xl font-black text-white">Transaction Timeline</h2>
       
       {status === "disputed" ? (
-        <div className="mt-4 flex items-start gap-3 rounded-2xl bg-[#fff4f4] p-4 text-[#c0392b]">
+        <div className="mt-4 flex items-start gap-3 rounded-2xl border border-[#f43f5e]/30 bg-[#f43f5e]/15 p-4 text-[#f43f5e]">
           <AlertCircle className="h-5 w-5 shrink-0" />
           <div>
             <p className="font-black text-sm">Deal Disputed</p>
-            <p className="text-xs font-semibold leading-5">An arbitrator is reviewing the uploaded deliverables and chat history.</p>
+            <p className="text-xs font-semibold leading-5 text-[#f43f5e]/90">An arbitrator is reviewing the uploaded deliverables and chat history.</p>
           </div>
         </div>
       ) : status === "cancelled" ? (
-        <div className="mt-4 flex items-start gap-3 rounded-2xl bg-[#f1f3f5] p-4 text-[#64748b]">
-          <XCircle className="h-5 w-5 shrink-0" />
+        <div className="mt-4 flex items-start gap-3 rounded-2xl border border-[#262932] bg-[#16181f] p-4 text-[#9ca3af]">
+          <XCircle className="h-5 w-5 shrink-0 text-[#9ca3af]" />
           <div>
-            <p className="font-black text-sm">Deal Cancelled</p>
-            <p className="text-xs font-semibold leading-5">This deal has been cancelled by the participants.</p>
+            <p className="font-black text-sm text-white">Deal Cancelled</p>
+            <p className="text-xs font-semibold leading-5 text-[#9ca3af]">This deal has been cancelled by the participants.</p>
           </div>
         </div>
       ) : null}
@@ -61,18 +61,18 @@ export function DealTimeline({ status }: DealTimelineProps) {
               <div className="flex flex-col items-center">
                 <span className={`flex h-8 w-8 items-center justify-center rounded-full ${
                   state === "pending" 
-                    ? "bg-white text-[#b7c6a6] border border-[#dfe3e8]" 
+                    ? "bg-[#16181f] text-[#6b7280] border border-[#262932]" 
                     : state === "current" 
-                      ? "bg-[#e6f7ff] text-[#00658e] border border-[#229ED9]" 
-                      : "bg-[#229ED9] text-white"
+                      ? "bg-[#a3e635]/15 text-[#a3e635] border border-[#a3e635]" 
+                      : "bg-[#a3e635] text-black"
                 }`}>
-                  {state === "done" ? <Check className="h-4 w-4" /> : <Circle className="h-2 w-2" />}
+                  {state === "done" ? <Check className="h-4 w-4 text-black" /> : <Circle className="h-2 w-2" />}
                 </span>
-                {index < steps.length - 1 ? <span className={`h-6 w-px ${item.isDone ? "bg-[#229ED9]" : "bg-[#dfe3e8]"}`} /> : null}
+                {index < steps.length - 1 ? <span className={`h-6 w-px ${item.isDone ? "bg-[#a3e635]" : "bg-[#262932]"}`} /> : null}
               </div>
               <div className="pt-0.5">
-                <p className={`font-black text-sm ${state === "pending" ? "text-[#a0aec0]" : "text-[#171c20]"}`}>{item.label}</p>
-                <p className="text-xs font-semibold text-[#64748b]">
+                <p className={`font-black text-sm ${state === "pending" ? "text-[#6b7280]" : "text-white"}`}>{item.label}</p>
+                <p className="text-xs font-semibold text-[#9ca3af]">
                   {state === "current" ? "Current Step" : state === "done" ? "Completed" : "Pending"}
                 </p>
               </div>

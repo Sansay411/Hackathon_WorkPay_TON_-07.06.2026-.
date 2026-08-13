@@ -13,7 +13,7 @@ export function LanguageSelect() {
       {languages.map((language) => (
         <button
           className={`rounded-2xl border p-4 text-left font-black shadow-sm transition ${
-            selected === language.code ? "border-[#229ED9] bg-[#229ED9] text-white" : "border-[#dfe3e8] bg-[#f6faff] text-[#171c20]"
+            selected === language.code ? "border-[#a3e635] bg-[#a3e635] text-black" : "border-[#262932] bg-[#16181f] text-white hover:border-[#a3e635]/40"
           }`}
           key={language.code}
           onClick={() => setLanguage(language.code)}

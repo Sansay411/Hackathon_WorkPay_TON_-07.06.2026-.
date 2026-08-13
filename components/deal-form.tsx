@@ -62,11 +62,11 @@ export function DealForm({ intentType, intentId }: { intentType?: string; intent
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-[34px] border border-[#dfe3e8] bg-white p-5 shadow-[0_18px_44px_rgba(0,101,142,0.10)]">
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-[34px] border border-[#262932] bg-[#111318] p-5 shadow-[0_18px_44px_rgba(0,0,0,0.8)] text-white">
         <label className="block space-y-2">
-          <span className="text-sm font-black text-[#171c20]">{t.dealForm.dealTitle} *</span>
+          <span className="text-sm font-black text-white">{t.dealForm.dealTitle} *</span>
           <input 
-            className="h-12 w-full rounded-[20px] border border-[#dfe3e8] bg-[#f6faff] px-4 py-3 text-sm font-semibold outline-none placeholder:text-[#64748b] focus:border-[#229ED9]" 
+            className="h-12 w-full rounded-[20px] border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-semibold text-white outline-none placeholder:text-[#6b7280] focus:border-[#a3e635]" 
             onChange={(event) => setTitle(event.target.value)} 
             placeholder={t.dealForm.dealTitlePlaceholder} 
             value={title} 
@@ -75,9 +75,9 @@ export function DealForm({ intentType, intentId }: { intentType?: string; intent
         </label>
         
         <label className="block space-y-2">
-          <span className="text-sm font-black text-[#171c20]">{t.dealForm.description} * (Min 20 chars)</span>
+          <span className="text-sm font-black text-white">{t.dealForm.description} * (Min 20 chars)</span>
           <textarea 
-            className="min-h-32 w-full rounded-[20px] border border-[#dfe3e8] bg-[#f6faff] px-4 py-3 text-sm font-semibold outline-none placeholder:text-[#64748b] focus:border-[#229ED9]" 
+            className="min-h-32 w-full rounded-[20px] border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-semibold text-white outline-none placeholder:text-[#6b7280] focus:border-[#a3e635]" 
             onChange={(event) => setDescription(event.target.value)} 
             placeholder={t.dealForm.descriptionPlaceholder} 
             value={description} 
@@ -87,9 +87,9 @@ export function DealForm({ intentType, intentId }: { intentType?: string; intent
 
         <div className="grid grid-cols-2 gap-3">
           <label className="block space-y-2">
-            <span className="text-sm font-black text-[#171c20]">{t.dealForm.price} *</span>
+            <span className="text-sm font-black text-white">{t.dealForm.price} *</span>
             <input 
-              className="h-12 w-full rounded-[20px] border border-[#dfe3e8] bg-[#f6faff] px-4 py-3 text-sm font-semibold outline-none placeholder:text-[#64748b] focus:border-[#229ED9]" 
+              className="h-12 w-full rounded-[20px] border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-semibold text-white outline-none placeholder:text-[#6b7280] focus:border-[#a3e635]" 
               inputMode="decimal" 
               onChange={(event) => setPrice(event.target.value)} 
               placeholder="250" 
@@ -98,24 +98,24 @@ export function DealForm({ intentType, intentId }: { intentType?: string; intent
             />
           </label>
           <label className="block space-y-2">
-            <span className="text-sm font-black text-[#171c20]">{t.dealForm.token}</span>
+            <span className="text-sm font-black text-white">{t.dealForm.token}</span>
             <select 
-              className="h-12 w-full rounded-[20px] border border-[#dfe3e8] bg-[#f6faff] px-4 py-3 text-sm font-semibold outline-none shadow-sm focus:border-[#229ED9]" 
+              className="h-12 w-full rounded-[20px] border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-semibold text-white outline-none shadow-sm focus:border-[#a3e635]" 
               onChange={(event) => setToken(event.target.value)} 
               value={token}
             >
-              <option>TON</option>
-              <option>USDT</option>
+              <option className="bg-[#111318] text-white">TON</option>
+              <option className="bg-[#111318] text-white">USDT</option>
             </select>
           </label>
         </div>
 
         <label className="block space-y-2">
-          <span className="text-sm font-black text-[#171c20]">{t.dealForm.deadline}</span>
-          <div className="flex items-center rounded-[20px] border border-[#dfe3e8] bg-[#f6faff] px-4 shadow-sm focus-within:border-[#229ED9]">
-            <CalendarDays className="h-4 w-4 text-[#64748b]" />
+          <span className="text-sm font-black text-white">{t.dealForm.deadline}</span>
+          <div className="flex items-center rounded-[20px] border border-[#262932] bg-[#16181f] px-4 shadow-sm focus-within:border-[#a3e635]">
+            <CalendarDays className="h-4 w-4 text-[#a3e635]" />
             <input 
-              className="h-12 w-full bg-transparent px-3 py-3 text-sm font-semibold outline-none" 
+              className="h-12 w-full bg-transparent px-3 py-3 text-sm font-semibold text-white outline-none" 
               onChange={(event) => setDeadline(event.target.value)} 
               type="date" 
               value={deadline} 
@@ -124,9 +124,9 @@ export function DealForm({ intentType, intentId }: { intentType?: string; intent
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm font-black text-[#171c20]">{t.dealForm.freelancerField} *</span>
+          <span className="text-sm font-black text-white">{t.dealForm.freelancerField} *</span>
           <input 
-            className="h-12 w-full rounded-[20px] border border-[#dfe3e8] bg-[#f6faff] px-4 py-3 text-sm font-semibold outline-none placeholder:text-[#64748b] focus:border-[#229ED9]" 
+            className="h-12 w-full rounded-[20px] border border-[#262932] bg-[#16181f] px-4 py-3 text-sm font-semibold text-white outline-none placeholder:text-[#6b7280] focus:border-[#a3e635]" 
             onChange={(event) => setFreelancerUsername(event.target.value)}
             placeholder={t.dealForm.freelancerPlaceholder} 
             value={freelancerUsername}
@@ -135,17 +135,17 @@ export function DealForm({ intentType, intentId }: { intentType?: string; intent
         </label>
 
         {errorMsg ? (
-          <div className="rounded-[20px] bg-[#fff4f4] p-4 text-xs font-black text-[#c0392b] leading-5">
+          <div className="rounded-[20px] border border-rose-500/40 bg-rose-500/15 p-4 text-xs font-black text-rose-400 leading-5">
             {errorMsg}
           </div>
         ) : null}
 
         <Button 
-          className="h-12 w-full rounded-[22px] bg-[#229ED9] py-3 font-black text-white shadow-[0_14px_24px_rgba(34,158,217,0.20)] hover:bg-[#168bc2] disabled:opacity-50" 
+          className="h-12 w-full rounded-[22px] bg-[#a3e635] py-3 font-black text-black shadow-[0_14px_24px_rgba(163,230,53,0.20)] hover:bg-[#84cc16] disabled:opacity-50" 
           type="submit"
           disabled={busy}
         >
-          <ShieldCheck className="h-4 w-4" />
+          <ShieldCheck className="h-4 w-4 text-black" />
           {busy ? "Creating Contract..." : "Create Escrow Contract"}
         </Button>
       </form>

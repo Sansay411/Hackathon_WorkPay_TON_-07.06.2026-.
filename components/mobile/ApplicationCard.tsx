@@ -14,24 +14,24 @@ export function ApplicationCard({ application }: { application: JobApplication }
   const { t } = useLanguage();
 
   return (
-    <section className="rounded-[28px] bg-[#ffffff] p-4 shadow-[0_14px_34px_rgba(17,24,15,0.09)]">
+    <section className="rounded-[28px] border border-[#262932] bg-[#111318] p-4 shadow-[0_14px_34px_rgba(0,0,0,0.6)] text-white">
       <div className="flex items-center justify-between">
-          <p className="font-black">{t.applicationCard.application}</p>
-          <span className="rounded-full bg-[#e6f7ff] px-3 py-1 text-xs font-black">{application.status}</span>
-        </div>
-      <p className="mt-2 text-sm font-semibold leading-5 text-[#64748b]">{application.proposalText}</p>
-      <div className="mt-4 flex items-center justify-between text-sm font-black">
+        <p className="font-black text-white">{t.applicationCard.application}</p>
+        <span className="rounded-full border border-[#a3e635]/30 bg-[#a3e635]/15 px-3 py-1 text-xs font-black text-[#a3e635]">{application.status}</span>
+      </div>
+      <p className="mt-2 text-sm font-semibold leading-5 text-[#9ca3af]">{application.proposalText}</p>
+      <div className="mt-4 flex items-center justify-between text-sm font-black text-[#a3e635]">
         <span className="flex items-center gap-1">
-          <Zap className="h-4 w-4 text-[#229ED9]" />
+          <Zap className="h-4 w-4 text-[#a3e635]" />
           {application.energyCost} {t.energyCard.label}
         </span>
         <span className="flex items-center gap-1">
-          <CheckCircle2 className="h-4 w-4 text-[#229ED9]" />
+          <CheckCircle2 className="h-4 w-4 text-[#a3e635]" />
           AI {application.aiScore ?? 0}/100
         </span>
       </div>
       <button
-        className="mt-4 w-full rounded-[20px] bg-[#e6f7ff] px-4 py-3 text-sm font-black text-[#171c20]"
+        className="mt-4 w-full rounded-[20px] bg-[#a3e635] px-4 py-3 text-sm font-black text-black hover:bg-[#84cc16] disabled:opacity-50"
         onClick={async () => {
           if (!isConnected || !walletAddress || !isTelegram) {
             setResult(t.walletGate.connectToContinue);
@@ -57,8 +57,8 @@ export function ApplicationCard({ application }: { application: JobApplication }
       >
         {isConnected && isTelegram ? t.applicationCard.accept : t.walletGate.connectToContinue}
       </button>
-      {!isTelegram ? <p className="mt-2 text-xs font-black text-[#64748b]">{t.applicationCard.openInsideTelegram}</p> : null}
-      {result ? <p className="mt-3 rounded-2xl bg-white p-3 text-xs font-black text-[#229ED9]">{result}</p> : null}
+      {!isTelegram ? <p className="mt-2 text-xs font-black text-[#9ca3af]">{t.applicationCard.openInsideTelegram}</p> : null}
+      {result ? <p className="mt-3 rounded-2xl border border-[#a3e635]/30 bg-[#16181f] p-3 text-xs font-black text-[#a3e635]">{result}</p> : null}
     </section>
   );
 }

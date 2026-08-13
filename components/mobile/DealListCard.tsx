@@ -20,24 +20,24 @@ export function DealListCard({ dealId, title, description, amount, status, risk 
   const href = `/deals/${dealId}` as Route;
 
   return (
-    <Link className="block rounded-2xl border border-[#dfe3e8] bg-white p-4 shadow-[0_8px_24px_rgba(0,101,142,0.06)]" href={href}>
+    <Link className="block rounded-2xl border border-[#262932] bg-[#111318] p-4 shadow-[0_8px_24px_rgba(0,0,0,0.6)] transition hover:border-[#a3e635]/40" href={href}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-black tracking-normal text-[#171c20]">{title}</h3>
-          <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-[#64748b]">{description}</p>
+          <h3 className="font-black tracking-normal text-white">{title}</h3>
+          <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-[#9ca3af]">{description}</p>
         </div>
-        <span className="shrink-0 rounded-full bg-[#e6f7ff] px-3 py-1 text-xs font-black text-[#00658e]">{status}</span>
+        <span className="shrink-0 rounded-full border border-[#a3e635]/30 bg-[#a3e635]/15 px-3 py-1 text-xs font-black text-[#a3e635]">{status}</span>
       </div>
       <div className="mt-4 flex items-center justify-between gap-3">
-        <span className="text-xl font-black">{amount}</span>
+        <span className="text-xl font-black text-[#a3e635]">{amount}</span>
         <AiRiskBadge risk={risk} />
       </div>
-      <div className="mt-4 flex items-center justify-between rounded-2xl bg-[#f6faff] px-3 py-2 text-xs font-bold text-[#64748b]">
+      <div className="mt-4 flex items-center justify-between rounded-2xl border border-[#262932] bg-[#16181f] px-3 py-2 text-xs font-bold text-[#9ca3af]">
         <span className="flex items-center gap-2">
-          <Clock3 className="h-3.5 w-3.5" />
+          <Clock3 className="h-3.5 w-3.5 text-[#a3e635]" />
           {t.dealList.eventHint}
         </span>
-        <ArrowRight className="h-4 w-4 text-[#229ED9]" />
+        <ArrowRight className="h-4 w-4 text-[#a3e635]" />
       </div>
     </Link>
   );

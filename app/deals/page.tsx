@@ -87,30 +87,30 @@ export default function DealsPage() {
 
   return (
     <MobileShell>
-      <div className="space-y-5">
+      <div className="space-y-5 text-white">
         <header className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-black text-[#229ED9]">WorkPay Dashboard</p>
-            <h1 className="mt-1 text-[34px] font-black leading-none tracking-normal">My Escrow Deals</h1>
+            <p className="text-sm font-black text-[#a3e635]">WorkPay Dashboard</p>
+            <h1 className="mt-1 text-[34px] font-black leading-none tracking-normal text-white">My Escrow Deals</h1>
           </div>
           <WorkPayLogo size="md" />
         </header>
 
-        <label className="flex h-14 items-center gap-3 rounded-[24px] border border-[#dfe3e8] bg-white px-4 shadow-[0_12px_30px_rgba(0,101,142,0.08)]">
-          <Search className="h-5 w-5 text-[#64748b]" />
+        <label className="flex h-14 items-center gap-3 rounded-[24px] border border-[#262932] bg-[#111318] px-4 shadow-[0_12px_30px_rgba(0,0,0,0.6)]">
+          <Search className="h-5 w-5 text-[#a3e635]" />
           <input 
-            className="w-full bg-transparent text-sm font-semibold outline-none placeholder:text-[#64748b]" 
+            className="w-full bg-transparent text-sm font-semibold text-white outline-none placeholder:text-[#6b7280]" 
             placeholder={t.deals.search} 
             onChange={(e) => setSearchTerm(e.target.value)}
             value={searchTerm}
           />
         </label>
 
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {["All", "Waiting", "Funded", "Completed", "Disputed"].map((tab) => (
             <button
-              className={`shrink-0 rounded-full px-4 py-2 text-sm font-black shadow-sm ${
-                activeTab === tab ? "bg-[#00658e] text-white" : "bg-white text-[#64748b]"
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-black shadow-sm transition ${
+                activeTab === tab ? "bg-[#a3e635] text-black shadow-[0_4px_16px_rgba(163,230,53,0.3)]" : "border border-[#262932] bg-[#111318] text-[#9ca3af] hover:text-white"
               }`}
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -122,7 +122,7 @@ export default function DealsPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-10 text-sm font-semibold text-[#64748b]">
+          <div className="text-center py-10 text-sm font-semibold text-[#9ca3af]">
             Loading deals...
           </div>
         ) : filteredDeals.length === 0 ? (
@@ -135,8 +135,8 @@ export default function DealsPage() {
         ) : (
           <section className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black">Contract List</h2>
-              <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-black text-[#64748b]">{t.common.liveFlow}</span>
+              <h2 className="text-xl font-black text-white">Contract List</h2>
+              <span className="rounded-full border border-[#262932] bg-[#16181f] px-3 py-1 text-xs font-black text-[#9ca3af]">{t.common.liveFlow}</span>
             </div>
             {filteredDeals.map((deal) => (
               <DealListCard 

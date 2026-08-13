@@ -99,21 +99,20 @@ export default function DealDetailPage() {
     if (!initData || !id) return;
     setBusy(true);
     setErrorMsg(null);
-
     try {
-      const response = await fetch(`/api/deals/${id}/status`, {
-        method: "POST",
+      const res = await fetch(`/api/deals/${id}/status`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ initData, status: targetStatus })
       });
-      const payload = await response.json();
-      if (!response.ok || !payload.ok) {
-        setErrorMsg(payload.error?.message ?? "Action failed.");
-        return;
+      const payload = await res.json();
+      if (!res.ok || !payload.ok) {
+        setErrorMsg(payload.error?.message ?? "Status update failed.");
+      } else {
+        setDeal(payload.data.deal);
       }
-      handleReload();
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "A connection issue occurred.");
+      setErrorMsg(err instanceof Error ? err.message : "Connection error.");
     } finally {
       setBusy(false);
     }
@@ -121,34 +120,29 @@ export default function DealDetailPage() {
 
   async function handleSubmitDelivery(e: React.FormEvent) {
     e.preventDefault();
-    if (!initData || !id) return;
-    if (!deliveryMessage) {
-      setErrorMsg("Please include a brief message with your submission.");
-      return;
-    }
+    if (!initData || !id || !deliveryMessage) return;
     setBusy(true);
     setErrorMsg(null);
-
     try {
-      const response = await fetch(`/api/deals/${id}/submit`, {
+      const res = await fetch(`/api/deals/${id}/deliveries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           initData,
           message: deliveryMessage,
-          file_url: deliveryLink || null
+          storagePath: deliveryLink || null
         })
       });
-      const payload = await response.json();
-      if (!response.ok || !payload.ok) {
-        setErrorMsg(payload.error?.message ?? "Submission failed.");
-        return;
+      const payload = await res.json();
+      if (!res.ok || !payload.ok) {
+        setErrorMsg(payload.error?.message ?? "Delivery submission failed.");
+      } else {
+        setDeliveryMessage("");
+        setDeliveryLink("");
+        handleReload();
       }
-      setDeliveryMessage("");
-      setDeliveryLink("");
-      handleReload();
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "A connection issue occurred.");
+      setErrorMsg(err instanceof Error ? err.message : "Connection error.");
     } finally {
       setBusy(false);
     }
@@ -157,22 +151,8 @@ export default function DealDetailPage() {
   if (loading) {
     return (
       <MobileShell>
-        <div className="flex h-64 items-center justify-center text-sm font-semibold text-[#64748b]">
+        <div className="flex h-64 items-center justify-center text-sm font-bold text-[#9ca3af]">
           Loading escrow contract details...
-        </div>
-      </MobileShell>
-    );
-  }
-
-  if (errorMsg && !deal) {
-    return (
-      <MobileShell>
-        <div className="rounded-3xl bg-[#fff4f4] p-5 text-center text-[#c0392b]">
-          <p className="font-black">Error occurred</p>
-          <p className="mt-2 text-sm font-semibold">{errorMsg}</p>
-          <button className="mt-4 rounded-2xl bg-[#c0392b] px-4 py-2 text-sm font-black text-white" onClick={handleReload}>
-            Retry
-          </button>
         </div>
       </MobileShell>
     );
@@ -181,8 +161,11 @@ export default function DealDetailPage() {
   if (!deal) {
     return (
       <MobileShell>
-        <div className="text-center py-10 text-sm font-semibold text-[#64748b]">
-          Contract not found.
+        <div className="space-y-4 rounded-[30px] border border-[#262932] bg-[#111318] p-6 text-center text-white">
+          <p className="text-[#f43f5e] font-black">{errorMsg ?? "Escrow contract not found or access denied."}</p>
+          <button onClick={handleReload} className="rounded-full bg-[#a3e635] px-4 py-2 text-xs font-black text-black">
+            Retry
+          </button>
         </div>
       </MobileShell>
     );
@@ -191,12 +174,12 @@ export default function DealDetailPage() {
   const isClient = profile?.id === deal.client_id;
   const isFreelancer = profile?.id === deal.freelancer_id;
 
-  function getFriendlyStatus(status: string): string {
+  function getFriendlyStatus(status: string) {
     switch (status) {
       case "draft":
-        return "Draft";
+        return "Draft (Waiting Acceptance)";
       case "waiting_payment":
-        return "Waiting Payment";
+        return "Waiting Escrow Payment";
       case "funded":
         return "Funded";
       case "in_progress":
@@ -216,60 +199,60 @@ export default function DealDetailPage() {
 
   return (
     <MobileShell>
-      <div className="space-y-5">
+      <div className="space-y-5 text-white">
         {/* Deal Header card */}
-        <header className="relative overflow-hidden rounded-[34px] bg-[#00658e] p-5 text-white shadow-[0_22px_44px_rgba(0,101,142,0.24)]">
-          <div className="absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#85cfff]/25" />
+        <header className="relative overflow-hidden rounded-[34px] border border-[#262932] bg-[#111318] p-5 text-white shadow-[0_22px_44px_rgba(0,0,0,0.8)]">
+          <div className="absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#a3e635]/10" />
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-sm font-black text-[#acedff]">Escrow Contract</p>
-              <h1 className="mt-2 text-[26px] font-black leading-tight tracking-normal truncate">{deal.title}</h1>
-              <p className="mt-1 text-xs font-semibold text-white/70">ID: {deal.id}</p>
+              <p className="text-sm font-black text-[#a3e635]">Escrow Contract</p>
+              <h1 className="mt-2 text-[26px] font-black leading-tight tracking-normal truncate text-white">{deal.title}</h1>
+              <p className="mt-1 text-xs font-semibold text-[#9ca3af]">ID: {deal.id}</p>
             </div>
-            <div className="rounded-2xl bg-white/10 p-3 text-[#acedff] shrink-0">
+            <div className="rounded-2xl border border-[#a3e635]/30 bg-[#a3e635]/15 p-3 text-[#a3e635] shrink-0">
               <ShieldCheck className="h-6 w-6" />
             </div>
           </div>
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="rounded-[22px] bg-white/10 p-3">
-              <p className="text-xs text-white/60">Amount</p>
-              <p className="mt-1 text-lg font-black truncate">{deal.price_amount} {deal.price_token}</p>
+            <div className="rounded-[22px] border border-[#262932] bg-[#16181f] p-3">
+              <p className="text-xs text-[#9ca3af]">Amount</p>
+              <p className="mt-1 text-lg font-black truncate text-[#a3e635]">{deal.price_amount} {deal.price_token}</p>
             </div>
-            <div className="rounded-[22px] bg-white/10 p-3">
-              <p className="text-xs text-white/60">Status</p>
-              <p className="mt-1 text-lg font-black truncate">{getFriendlyStatus(deal.status)}</p>
+            <div className="rounded-[22px] border border-[#262932] bg-[#16181f] p-3">
+              <p className="text-xs text-[#9ca3af]">Status</p>
+              <p className="mt-1 text-lg font-black truncate text-white">{getFriendlyStatus(deal.status)}</p>
             </div>
           </div>
         </header>
 
         {/* Agreement Details */}
-        <section className="rounded-[30px] border border-[#dfe3e8] bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-black text-[#171c20]">Scope & Terms</h2>
-          <p className="mt-3 text-sm font-semibold leading-6 text-[#64748b] whitespace-pre-wrap">{deal.description}</p>
+        <section className="rounded-[30px] border border-[#262932] bg-[#111318] p-5 shadow-sm text-white">
+          <h2 className="text-lg font-black text-white">Scope & Terms</h2>
+          <p className="mt-3 text-sm font-semibold leading-6 text-[#9ca3af] whitespace-pre-wrap">{deal.description}</p>
           
-          <div className="mt-4 pt-4 border-t border-[#f0f2f5] grid grid-cols-2 gap-3 text-xs font-semibold text-[#64748b]">
+          <div className="mt-4 pt-4 border-t border-[#262932] grid grid-cols-2 gap-3 text-xs font-semibold text-[#9ca3af]">
             <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-[#229ED9]" />
+              <User className="h-4 w-4 text-[#a3e635]" />
               <div>
-                <p className="text-[10px] text-[#94a3b8] uppercase">Client</p>
-                <p className="font-bold text-[#171c20] truncate">{deal.client?.first_name}</p>
+                <p className="text-[10px] text-[#6b7280] uppercase">Client</p>
+                <p className="font-bold text-white truncate">{deal.client?.first_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-[#229ED9]" />
+              <User className="h-4 w-4 text-[#a3e635]" />
               <div>
-                <p className="text-[10px] text-[#94a3b8] uppercase">Freelancer</p>
-                <p className="font-bold text-[#171c20] truncate">{deal.freelancer?.first_name}</p>
+                <p className="text-[10px] text-[#6b7280] uppercase">Freelancer</p>
+                <p className="font-bold text-white truncate">{deal.freelancer?.first_name}</p>
               </div>
             </div>
           </div>
 
           {deal.deadline ? (
-            <div className="mt-3 pt-3 border-t border-[#f0f2f5] flex items-center gap-2 text-xs font-semibold text-[#64748b]">
-              <Calendar className="h-4 w-4 text-[#229ED9]" />
+            <div className="mt-3 pt-3 border-t border-[#262932] flex items-center gap-2 text-xs font-semibold text-[#9ca3af]">
+              <Calendar className="h-4 w-4 text-[#a3e635]" />
               <div>
-                <p className="text-[10px] text-[#94a3b8] uppercase">Deadline</p>
-                <p className="font-bold text-[#171c20]">{new Date(deal.deadline).toLocaleDateString()}</p>
+                <p className="text-[10px] text-[#6b7280] uppercase">Deadline</p>
+                <p className="font-bold text-white">{new Date(deal.deadline).toLocaleDateString()}</p>
               </div>
             </div>
           ) : null}
@@ -288,7 +271,7 @@ export default function DealDetailPage() {
         {/* Dynamic Action Buttons based on status & role */}
         <section className="space-y-3">
           {errorMsg ? (
-            <div className="rounded-[20px] bg-[#fff4f4] p-4 text-xs font-black text-[#c0392b] leading-5">
+            <div className="rounded-[20px] border border-rose-500/40 bg-rose-500/15 p-4 text-xs font-black text-rose-400 leading-5">
               {errorMsg}
             </div>
           ) : null}
@@ -296,21 +279,21 @@ export default function DealDetailPage() {
           {/* DRAFT (Waiting acceptance) */}
           {deal.status === "draft" && isFreelancer ? (
             <button
-              className="w-full rounded-[22px] bg-[#229ED9] px-4 py-3 font-black text-white shadow-sm disabled:opacity-50"
+              className="w-full rounded-[22px] bg-[#a3e635] px-4 py-3 font-black text-black shadow-sm disabled:opacity-50 hover:bg-[#84cc16]"
               onClick={() => handleTransition("waiting_payment")}
               disabled={busy}
             >
               Accept Contract & Terms
             </button>
           ) : deal.status === "draft" && isClient ? (
-            <div className="rounded-2xl bg-[#f6faff] p-4 text-center text-xs font-semibold text-[#64748b]">
+            <div className="rounded-2xl border border-[#262932] bg-[#16181f] p-4 text-center text-xs font-semibold text-[#9ca3af]">
               Awaiting freelancer acceptance of escrow terms.
             </div>
           ) : null}
 
           {/* WAITING PAYMENT (Freelancer waiting for Client to fund) */}
           {deal.status === "waiting_payment" && isFreelancer ? (
-            <div className="rounded-2xl bg-[#f6faff] p-4 text-center text-xs font-semibold text-[#64748b]">
+            <div className="rounded-2xl border border-[#262932] bg-[#16181f] p-4 text-center text-xs font-semibold text-[#9ca3af]">
               Awaiting client escrow payment.
             </div>
           ) : null}
@@ -318,14 +301,14 @@ export default function DealDetailPage() {
           {/* FUNDED (Escrow locked, freelancer starts work) */}
           {deal.status === "funded" && isFreelancer ? (
             <button
-              className="w-full rounded-[22px] bg-[#229ED9] px-4 py-3 font-black text-white shadow-sm disabled:opacity-50"
+              className="w-full rounded-[22px] bg-[#a3e635] px-4 py-3 font-black text-black shadow-sm disabled:opacity-50 hover:bg-[#84cc16]"
               onClick={() => handleTransition("in_progress")}
               disabled={busy}
             >
               Start Work (Confirm Escrow Lock)
             </button>
           ) : deal.status === "funded" && isClient ? (
-            <div className="rounded-2xl bg-[#e6f7ff] p-4 text-center text-xs font-semibold text-[#00658e]">
+            <div className="rounded-2xl border border-[#a3e635]/40 bg-[#a3e635]/15 p-4 text-center text-xs font-semibold text-[#a3e635]">
               Escrow funds locked. Awaiting freelancer to confirm work initiation.
             </div>
           ) : null}
@@ -334,9 +317,9 @@ export default function DealDetailPage() {
           {deal.status === "in_progress" && isFreelancer ? (
             <div className="space-y-4">
               {/* Progress Update Panel */}
-              <div className="rounded-[30px] border border-[#dfe3e8] bg-white p-5 shadow-sm space-y-3">
-                <h3 className="font-black text-[#171c20]">Log Progress</h3>
-                <p className="text-xs font-semibold text-[#64748b] leading-relaxed">
+              <div className="rounded-[30px] border border-[#262932] bg-[#111318] p-5 shadow-sm space-y-3">
+                <h3 className="font-black text-white">Log Progress</h3>
+                <p className="text-xs font-semibold text-[#9ca3af] leading-relaxed">
                   Select your current status to log it on-chain/in database:
                 </p>
                 <div className="grid grid-cols-3 gap-2">
@@ -367,7 +350,7 @@ export default function DealDetailPage() {
                           setBusy(false);
                         }
                       }}
-                      className="rounded-xl border border-[#dfe3e8] bg-[#f6faff] py-2 text-[10px] font-black text-[#00658e] hover:border-[#229ED9] active:scale-95 transition-all"
+                      className="rounded-xl border border-[#262932] bg-[#16181f] py-2 text-[10px] font-black text-[#a3e635] hover:border-[#a3e635] active:scale-95 transition-all"
                     >
                       {stepName}
                     </button>
@@ -376,12 +359,12 @@ export default function DealDetailPage() {
               </div>
 
               {/* Submit Deliverables Form */}
-              <form onSubmit={handleSubmitDelivery} className="rounded-[30px] border border-[#dfe3e8] bg-white p-5 shadow-sm space-y-3">
-                <h3 className="font-black text-[#171c20]">Submit Deliverables</h3>
+              <form onSubmit={handleSubmitDelivery} className="rounded-[30px] border border-[#262932] bg-[#111318] p-5 shadow-sm space-y-3">
+                <h3 className="font-black text-white">Submit Deliverables</h3>
                 <label className="block space-y-1">
-                  <span className="text-xs font-black text-[#64748b]">Message to Client</span>
+                  <span className="text-xs font-black text-[#9ca3af]">Message to Client</span>
                   <textarea
-                    className="min-h-20 w-full rounded-xl border border-[#dfe3e8] bg-[#f6faff] px-3 py-2 text-xs font-semibold outline-none focus:border-[#229ED9]"
+                    className="min-h-20 w-full rounded-xl border border-[#262932] bg-[#16181f] px-3 py-2 text-xs font-semibold text-white outline-none focus:border-[#a3e635]"
                     placeholder="e.g. Logo designs are completed and attached."
                     onChange={(e) => setDeliveryMessage(e.target.value)}
                     value={deliveryMessage}
@@ -389,9 +372,9 @@ export default function DealDetailPage() {
                   />
                 </label>
                 <label className="block space-y-1">
-                  <span className="text-xs font-black text-[#64748b]">Work URL / Deliverable Link</span>
+                  <span className="text-xs font-black text-[#9ca3af]">Work URL / Deliverable Link</span>
                   <input
-                    className="h-10 w-full rounded-xl border border-[#dfe3e8] bg-[#f6faff] px-3 text-xs font-semibold outline-none focus:border-[#229ED9]"
+                    className="h-10 w-full rounded-xl border border-[#262932] bg-[#16181f] px-3 text-xs font-semibold text-white outline-none focus:border-[#a3e635]"
                     placeholder="https://drive.google.com/... or Figma Link"
                     type="url"
                     onChange={(e) => setDeliveryLink(e.target.value)}
@@ -399,7 +382,7 @@ export default function DealDetailPage() {
                   />
                 </label>
                 <button
-                  className="w-full rounded-xl bg-[#229ED9] py-2.5 text-xs font-black text-white disabled:opacity-50"
+                  className="w-full rounded-xl bg-[#a3e635] py-2.5 text-xs font-black text-black hover:bg-[#84cc16] disabled:opacity-50"
                   type="submit"
                   disabled={busy}
                 >
@@ -408,7 +391,7 @@ export default function DealDetailPage() {
               </form>
             </div>
           ) : deal.status === "in_progress" && isClient ? (
-            <div className="rounded-2xl bg-[#f6faff] p-4 text-center text-xs font-semibold text-[#64748b]">
+            <div className="rounded-2xl border border-[#262932] bg-[#16181f] p-4 text-center text-xs font-semibold text-[#9ca3af]">
               Contract is in progress. Awaiting freelancer work submission.
             </div>
           ) : null}
@@ -417,14 +400,14 @@ export default function DealDetailPage() {
           {deal.status === "submitted" && isClient ? (
             <div className="space-y-2">
               <button
-                className="w-full rounded-[22px] bg-[#229ED9] px-4 py-3 font-black text-white shadow-sm disabled:opacity-50"
+                className="w-full rounded-[22px] bg-[#a3e635] px-4 py-3 font-black text-black shadow-sm disabled:opacity-50 hover:bg-[#84cc16]"
                 onClick={() => handleTransition("completed")}
                 disabled={busy}
               >
                 Approve & Release Escrow
               </button>
               <button
-                className="w-full rounded-[22px] border border-[#c0392b] bg-white px-4 py-3 font-black text-[#c0392b] shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full rounded-[22px] border border-rose-500/50 bg-[#111318] px-4 py-3 font-black text-rose-400 shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
                 onClick={() => handleTransition("disputed")}
                 disabled={busy}
               >
@@ -433,7 +416,7 @@ export default function DealDetailPage() {
               </button>
             </div>
           ) : deal.status === "submitted" && isFreelancer ? (
-            <div className="rounded-2xl bg-[#e6f7ff] p-4 text-center text-xs font-semibold text-[#00658e]">
+            <div className="rounded-2xl border border-[#a3e635]/40 bg-[#a3e635]/15 p-4 text-center text-xs font-semibold text-[#a3e635]">
               Work submitted. Awaiting client review and release.
             </div>
           ) : null}
@@ -441,7 +424,7 @@ export default function DealDetailPage() {
           {/* GENERAL CANCEL & DISPUTE ACTIONS */}
           {(deal.status === "draft" || deal.status === "waiting_payment") && (isClient || isFreelancer) ? (
             <button
-              className="w-full rounded-[22px] bg-[#f1f3f5] hover:bg-[#e2e8f0] px-4 py-3 text-sm font-black text-[#64748b] transition-colors"
+              className="w-full rounded-[22px] border border-[#262932] bg-[#16181f] hover:bg-[#222630] px-4 py-3 text-sm font-black text-[#9ca3af] transition-colors"
               onClick={() => handleTransition("cancelled")}
               disabled={busy}
             >
@@ -451,7 +434,7 @@ export default function DealDetailPage() {
 
           {(deal.status === "funded" || deal.status === "in_progress") && (isClient || isFreelancer) ? (
             <button
-              className="w-full rounded-[22px] border border-[#c0392b] bg-white px-4 py-3 text-sm font-black text-[#c0392b] shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full rounded-[22px] border border-rose-500/50 bg-[#111318] px-4 py-3 text-sm font-black text-rose-400 shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
               onClick={() => handleTransition("disputed")}
               disabled={busy}
             >
@@ -463,19 +446,19 @@ export default function DealDetailPage() {
 
         {/* Deliveries Display list */}
         {deal.deliveries && deal.deliveries.length > 0 ? (
-          <section className="rounded-[30px] border border-[#dfe3e8] bg-white p-5 shadow-sm space-y-4">
-            <h2 className="text-lg font-black text-[#171c20] flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#229ED9]" />
+          <section className="rounded-[30px] border border-[#262932] bg-[#111318] p-5 shadow-sm space-y-4 text-white">
+            <h2 className="text-lg font-black text-white flex items-center gap-2">
+              <FileText className="h-5 w-5 text-[#a3e635]" />
               Submitted Work
             </h2>
             <div className="space-y-3">
               {deal.deliveries.map((item) => (
-                <div key={item.id} className="rounded-2xl bg-[#f6faff] p-3 text-xs border border-[#eef3f8]">
-                  <p className="font-semibold text-[#171c20] whitespace-pre-wrap">{item.message}</p>
+                <div key={item.id} className="rounded-2xl border border-[#262932] bg-[#16181f] p-3 text-xs">
+                  <p className="font-semibold text-white whitespace-pre-wrap">{item.message}</p>
                   {item.storage_path ? (
                     <div className="mt-2">
                       <a 
-                        className="font-black text-[#229ED9] hover:underline break-all" 
+                        className="font-black text-[#a3e635] hover:underline break-all" 
                         href={item.storage_path} 
                         target="_blank" 
                         rel="noreferrer"
@@ -484,7 +467,7 @@ export default function DealDetailPage() {
                       </a>
                     </div>
                   ) : null}
-                  <p className="mt-2 text-[10px] text-[#94a3b8] text-right">
+                  <p className="mt-2 text-[10px] text-[#6b7280] text-right">
                     {new Date(item.submitted_at).toLocaleString()}
                   </p>
                 </div>
@@ -496,8 +479,8 @@ export default function DealDetailPage() {
         {/* Timeline of transaction step */}
         <DealTimeline status={deal.status} />
 
-        <Link className="flex items-center justify-center gap-2 rounded-[22px] bg-[#229ED9] px-4 py-3 font-black text-white" href={`/deals/${deal.id}/receipt`}>
-          <ReceiptText className="h-4 w-4" />
+        <Link className="flex items-center justify-center gap-2 rounded-[22px] bg-[#a3e635] px-4 py-3 font-black text-black hover:bg-[#84cc16]" href={`/deals/${deal.id}/receipt`}>
+          <ReceiptText className="h-4 w-4 text-black" />
           {t.dealDetail.openReceipt}
         </Link>
       </div>

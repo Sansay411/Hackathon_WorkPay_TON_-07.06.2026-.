@@ -5,9 +5,9 @@ import { useLanguage } from "@/components/language-provider";
 type Risk = "Low" | "Medium" | "High";
 
 const riskStyles: Record<Risk, string> = {
-  Low: "bg-[#e6f7ff] text-[#00658e] ring-[#c7e7ff]",
-  Medium: "bg-[#fff1b8] text-[#6b5300] ring-[#ffe58a]",
-  High: "bg-[#ffe0e4] text-[#9f1239] ring-[#ffc2cc]"
+  Low: "bg-[#a3e635]/15 text-[#a3e635] ring-[#a3e635]/40",
+  Medium: "bg-[#facc15]/15 text-[#facc15] ring-[#facc15]/40",
+  High: "bg-[#f43f5e]/15 text-[#f43f5e] ring-[#f43f5e]/40"
 };
 
 export function AiRiskBadge({ risk }: { risk: Risk }) {
